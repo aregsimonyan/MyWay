@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">MyWay</string>
+
+    <string-array name="cities_array">
+        <item>Yerevan (Labour Square)</item>
+        <item>Masis</item>
+        <item>Artashat</item>
+        <item>Vedi</item>
+        <item>Ararat</item>
+        <item>Khosrov Forest</item>
+        <item>Other Village</item>
+    </string-array>
+</resources>
