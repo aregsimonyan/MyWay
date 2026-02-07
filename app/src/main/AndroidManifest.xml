@@ -16,6 +16,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyWay"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyD51kDfLUhm2hKmNcHqvF0DWjrhX69zanU" />
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
         <activity
             android:name=".AddTripActivity"
             android:exported="false" />
@@ -36,6 +42,9 @@
             android:exported="false" />
         <activity
             android:name=".PassengerHomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MapActivity"
             android:exported="false" />
     </application>
 

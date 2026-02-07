@@ -3,6 +3,8 @@ package com.example.myway;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -34,7 +36,7 @@ import java.util.List;
 public class PassengerHomeActivity extends AppCompatActivity {
 
     private Spinner spinnerFrom, spinnerTo;
-    private Button btnSearch;
+    private Button btnSearch, btnMap;
     private RecyclerView recyclerView;
     private TripAdapter adapter;
     private List<Trip> tripList;
@@ -53,6 +55,7 @@ public class PassengerHomeActivity extends AppCompatActivity {
         spinnerFrom = findViewById(R.id.spinnerSearchFrom);
         spinnerTo = findViewById(R.id.spinnerSearchTo);
         btnSearch = findViewById(R.id.btnSearch);
+        btnMap = findViewById(R.id.btnOpenMap);
         recyclerView = findViewById(R.id.recyclerViewTrips);
 
         tripList = new ArrayList<>();
@@ -75,7 +78,13 @@ public class PassengerHomeActivity extends AppCompatActivity {
             }
         });
 
-        // Load all trips initially
+        btnMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(PassengerHomeActivity.this, MapActivity.class));
+            }
+        });
+
         loadAllTrips();
     }
 
@@ -180,5 +189,31 @@ public class PassengerHomeActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.common_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_logout) {
+            FirebaseAuth.getInstance().signOut();
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return true;
+        } else if (id == R.id.action_account) {
+            startActivity(new Intent(this, ProfileActivity.class));
+            return true;
+        } else if (id == R.id.action_settings) {
+            Toast.makeText(this, "Settings coming soon!", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

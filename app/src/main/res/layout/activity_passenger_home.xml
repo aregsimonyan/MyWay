@@ -44,6 +44,16 @@
         android:textColor="#FFFFFF"
         android:layout_marginBottom="10dp"/>
 
+    <!-- This is the button that was missing -->
+    <Button
+        android:id="@+id/btnOpenMap"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="OPEN LIVE MAP"
+        android:backgroundTint="#2196F3"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="10dp"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewTrips"
         android:layout_width="match_parent"

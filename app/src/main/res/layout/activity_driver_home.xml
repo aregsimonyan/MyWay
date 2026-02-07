@@ -24,12 +24,10 @@
         android:textColor="#FFFFFF"
         android:layout_marginBottom="20dp"/>
 
-    <Button
-        android:id="@+id/btnLogoutDriver"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="LOGOUT"
-        android:backgroundTint="#FF0000"
-        android:textColor="#FFFFFF"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Use the top-right menu for options"
+        android:textColor="#888888"/>
 
 </LinearLayout>

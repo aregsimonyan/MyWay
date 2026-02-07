@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center_horizontal">
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@android:drawable/sym_def_app_icon"
+        android:layout_marginBottom="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="My Profile"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="30dp"/>
+
+    <TextView
+        android:id="@+id/tvProfileName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Name: Loading..."
+        android:textSize="18sp"
+        android:padding="10dp"
+        android:background="#F0F0F0"
+        android:layout_marginBottom="10dp"/>
+
+    <TextView
+        android:id="@+id/tvProfileEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Email: Loading..."
+        android:textSize="18sp"
+        android:padding="10dp"
+        android:background="#F0F0F0"
+        android:layout_marginBottom="10dp"/>
+
+    <TextView
+        android:id="@+id/tvProfilePhone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Phone: Loading..."
+        android:textSize="18sp"
+        android:padding="10dp"
+        android:background="#F0F0F0"
+        android:layout_marginBottom="10dp"/>
+
+    <TextView
+        android:id="@+id/tvProfileType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Type: Loading..."
+        android:textSize="18sp"
+        android:padding="10dp"
+        android:background="#F0F0F0"
+        android:layout_marginBottom="10dp"/>
+
+    <TextView
+        android:id="@+id/tvProfileCar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Car: N/A"
+        android:textSize="18sp"
+        android:padding="10dp"
+        android:background="#F0F0F0"
+        android:visibility="gone"/>
+
+</LinearLayout>
