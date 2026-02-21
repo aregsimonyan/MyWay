@@ -1,73 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:gravity="center_horizontal">
+    android:background="#FFFFFF">
 
-    <ImageView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:src="@android:drawable/sym_def_app_icon"
-        android:layout_marginBottom="20dp"/>
+    <ImageButton
+        android:id="@+id/btnMore"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/ic_more_vert"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="More options"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="My Profile"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="30dp"/>
-
-    <TextView
-        android:id="@+id/tvProfileName"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Name: Loading..."
-        android:textSize="18sp"
-        android:padding="10dp"
-        android:background="#F0F0F0"
-        android:layout_marginBottom="10dp"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
 
-    <TextView
-        android:id="@+id/tvProfileEmail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Email: Loading..."
-        android:textSize="18sp"
-        android:padding="10dp"
-        android:background="#F0F0F0"
-        android:layout_marginBottom="10dp"/>
+        <ImageView
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:src="@android:drawable/sym_def_app_icon"
+            android:layout_marginTop="48dp"
+            android:layout_marginBottom="12dp"/>
 
-    <TextView
-        android:id="@+id/tvProfilePhone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Phone: Loading..."
-        android:textSize="18sp"
-        android:padding="10dp"
-        android:background="#F0F0F0"
-        android:layout_marginBottom="10dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="My Profile"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="#212121"
+            android:layout_marginBottom="32dp"/>
 
-    <TextView
-        android:id="@+id/tvProfileType"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Type: Loading..."
-        android:textSize="18sp"
-        android:padding="10dp"
-        android:background="#F0F0F0"
-        android:layout_marginBottom="10dp"/>
+        <TextView
+            android:id="@+id/tvProfileName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Name: Loading..."
+            android:textSize="16sp"
+            android:padding="14dp"
+            android:background="#F5F5F5"
+            android:textColor="#212121"
+            android:layout_marginBottom="10dp"/>
 
-    <TextView
-        android:id="@+id/tvProfileCar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Car: N/A"
-        android:textSize="18sp"
-        android:padding="10dp"
-        android:background="#F0F0F0"
-        android:visibility="gone"/>
+        <TextView
+            android:id="@+id/tvProfileEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Email: Loading..."
+            android:textSize="16sp"
+            android:padding="14dp"
+            android:background="#F5F5F5"
+            android:textColor="#212121"
+            android:layout_marginBottom="10dp"/>
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/tvProfilePhone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Phone: Loading..."
+            android:textSize="16sp"
+            android:padding="14dp"
+            android:background="#F5F5F5"
+            android:textColor="#212121"
+            android:layout_marginBottom="10dp"/>
+
+        <TextView
+            android:id="@+id/tvProfileType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Type: Loading..."
+            android:textSize="16sp"
+            android:padding="14dp"
+            android:background="#F5F5F5"
+            android:textColor="#212121"
+            android:layout_marginBottom="10dp"/>
+
+        <TextView
+            android:id="@+id/tvProfileCar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Car: N/A"
+            android:textSize="16sp"
+            android:padding="14dp"
+            android:background="#F5F5F5"
+            android:textColor="#212121"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

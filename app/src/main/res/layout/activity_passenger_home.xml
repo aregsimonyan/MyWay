@@ -8,16 +8,33 @@
     android:padding="24dp"
     android:background="#FFFFFF">
 
-    <TextView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Find a Ride"
-        android:textSize="32sp"
-        android:textStyle="bold"
-        android:textColor="#212121"
-        android:fontFamily="sans-serif-black"
-        android:letterSpacing="-0.02"
-        android:layout_marginBottom="24dp"/>
+        android:layout_marginBottom="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Find a Ride"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:textColor="#212121"
+            android:fontFamily="sans-serif-black"
+            android:letterSpacing="-0.02"
+            android:layout_centerVertical="true"/>
+
+        <ImageButton
+            android:id="@+id/btnMore"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_more_vert"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="More options"/>
+
+    </RelativeLayout>
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
@@ -49,7 +66,7 @@
                 android:id="@+id/spinnerSearchFrom"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_marginBottom="12dp" />
+                android:layout_marginBottom="12dp"/>
 
             <View
                 android:layout_width="match_parent"
@@ -123,4 +140,5 @@
         android:layout_weight="1"
         android:scrollbars="vertical"
         tools:listitem="@android:layout/simple_list_item_2"/>
+
 </LinearLayout>
