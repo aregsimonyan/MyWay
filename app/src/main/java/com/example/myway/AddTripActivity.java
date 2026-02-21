@@ -90,6 +90,8 @@ public class AddTripActivity extends AppCompatActivity {
     }
 
     private void fetchDriverDetails() {
+        if(mAuth.getCurrentUser() == null) return;
+
         String uid = mAuth.getCurrentUser().getUid();
         db.collection("users").document(uid).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {

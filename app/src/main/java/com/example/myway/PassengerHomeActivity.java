@@ -3,8 +3,6 @@ package com.example.myway;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -49,18 +47,31 @@ public class PassengerHomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_passenger_home);
 
+
+        initializeFirebase();
+        initializeViews();
+        setupRecyclerView();
+        setupSpinners();
+        setupClickListeners();
+        loadAllTrips();
+    }
+
+    private void initializeFirebase() {
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
+    }
 
+    private void initializeViews() {
         spinnerFrom = findViewById(R.id.spinnerSearchFrom);
         spinnerTo = findViewById(R.id.spinnerSearchTo);
         btnSearch = findViewById(R.id.btnSearch);
         btnMap = findViewById(R.id.btnOpenMap);
         recyclerView = findViewById(R.id.recyclerViewTrips);
-
         tripList = new ArrayList<>();
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+    }
 
+    private void setupRecyclerView() {
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new TripAdapter(tripList, new TripAdapter.OnTripClickListener() {
             @Override
             public void onBookClick(Trip trip) {
@@ -68,9 +79,17 @@ public class PassengerHomeActivity extends AppCompatActivity {
             }
         });
         recyclerView.setAdapter(adapter);
+    }
 
-        setupSpinners();
+    private void setupSpinners() {
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.cities_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerFrom.setAdapter(adapter);
+        spinnerTo.setAdapter(adapter);
+    }
 
+    private void setupClickListeners() {
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,16 +103,6 @@ public class PassengerHomeActivity extends AppCompatActivity {
                 startActivity(new Intent(PassengerHomeActivity.this, MapActivity.class));
             }
         });
-
-        loadAllTrips();
-    }
-
-    private void setupSpinners() {
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.cities_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerFrom.setAdapter(adapter);
-        spinnerTo.setAdapter(adapter);
     }
 
     private void loadAllTrips() {
@@ -107,7 +116,7 @@ public class PassengerHomeActivity extends AppCompatActivity {
                             tripList.clear();
                             for (DocumentSnapshot doc : task.getResult()) {
                                 Trip trip = doc.toObject(Trip.class);
-                                if (trip.getSeatsAvailable() > 0) {
+                                if (trip != null && trip.getSeatsAvailable() > 0) {
                                     tripList.add(trip);
                                 }
                             }
@@ -133,7 +142,7 @@ public class PassengerHomeActivity extends AppCompatActivity {
                             tripList.clear();
                             for (DocumentSnapshot doc : task.getResult()) {
                                 Trip trip = doc.toObject(Trip.class);
-                                if (trip.getSeatsAvailable() > 0) {
+                                if (trip != null && trip.getSeatsAvailable() > 0) {
                                     tripList.add(trip);
                                 }
                             }
@@ -183,37 +192,11 @@ public class PassengerHomeActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
                     Toast.makeText(PassengerHomeActivity.this, "Booking Confirmed!", Toast.LENGTH_LONG).show();
-                    searchTrips();
+                    loadAllTrips();
                 } else {
                     Toast.makeText(PassengerHomeActivity.this, "Booking Failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.common_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_logout) {
-            FirebaseAuth.getInstance().signOut();
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-            return true;
-        } else if (id == R.id.action_account) {
-            startActivity(new Intent(this, ProfileActivity.class));
-            return true;
-        } else if (id == R.id.action_settings) {
-            Toast.makeText(this, "Settings coming soon!", Toast.LENGTH_SHORT).show();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }

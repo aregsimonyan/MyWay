@@ -25,6 +25,11 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setElevation(0);
+        }
+
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
@@ -38,6 +43,8 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void loadProfileData() {
+        if(mAuth.getCurrentUser() == null) return;
+
         String uid = mAuth.getCurrentUser().getUid();
         db.collection("users").document(uid).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
