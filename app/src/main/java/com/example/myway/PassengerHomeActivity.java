@@ -2,7 +2,12 @@ package com.example.myway;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -30,6 +35,8 @@ import com.google.firebase.firestore.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+
 
 public class PassengerHomeActivity extends AppCompatActivity {
 
@@ -41,9 +48,14 @@ public class PassengerHomeActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
+    private SharedPreferences languagePrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        languagePrefs = getSharedPreferences("LanguagePrefs", MODE_PRIVATE);
+        loadLocale();
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_passenger_home);
 
@@ -168,6 +180,111 @@ public class PassengerHomeActivity extends AppCompatActivity {
                 .setNegativeButton("No", null)
                 .show();
     }
+    private void showLanguageDialog() {
+        final String[] languages = {"English", "Русский", "Հայերեն"};
+        final String[] languageCodes = {"en", "ru", "hy"};
+
+
+        int currentSelection = getCurrentLanguageIndex(languageCodes);
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select Language");
+        builder.setSingleChoiceItems(languages, currentSelection, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                setLocale(languageCodes[which]);
+                dialog.dismiss();
+                recreate();
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+        builder.create().show();
+    }
+
+
+    private int getCurrentLanguageIndex(String[] codes) {
+        String currentLang = languagePrefs.getString("language", "en");
+        for (int i = 0; i < codes.length; i++) {
+            if (codes[i].equals(currentLang)) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+
+    private void setLocale(String languageCode) {
+        Locale locale = new Locale(languageCode);
+        Locale.setDefault(locale);
+
+
+        Resources resources = getResources();
+        Configuration configuration = resources.getConfiguration();
+        configuration.setLocale(locale);
+        resources.updateConfiguration(configuration, resources.getDisplayMetrics());
+
+
+        SharedPreferences.Editor editor = languagePrefs.edit();
+        editor.putString("language", languageCode);
+        editor.apply();
+    }
+
+
+    private void loadLocale() {
+        String languageCode = languagePrefs.getString("language", "en");
+        setLocale(languageCode);
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.common_menu, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+
+        if (id == R.id.action_logout) {
+            showLogoutConfirmation();
+            return true;
+        } else if (id == R.id.action_account) {
+            startActivity(new Intent(this, ProfileActivity.class));
+            return true;
+        } else if (id == R.id.action_language) {
+            showLanguageDialog();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    private void showLogoutConfirmation() {
+        new AlertDialog.Builder(this)
+                .setTitle("Sign Out")
+                .setMessage("Are you sure you want to sign out?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        performLogout();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+
+    private void performLogout() {
+        FirebaseAuth.getInstance().signOut();
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
 
     private void executeBooking(Trip trip) {
         final DocumentReference tripRef = db.collection("trips").document(trip.getTripId());
@@ -200,3 +317,4 @@ public class PassengerHomeActivity extends AppCompatActivity {
         });
     }
 }
+
