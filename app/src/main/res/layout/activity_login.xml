@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:padding="24dp"
     android:gravity="center"
-    android:background="#FFFFFF">
+    android:background="@color/colorBackground">
 
     <TextView
         android:layout_width="wrap_content"
@@ -14,7 +14,7 @@
         android:text="MyWay"
         android:textSize="40sp"
         android:textStyle="bold"
-        android:textColor="#212121"
+        android:textColor="@color/colorPrimaryText"
         android:fontFamily="sans-serif-black"
         android:letterSpacing="-0.02"
         android:layout_marginBottom="8dp"/>
@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:text="Welcome back, please login."
         android:textSize="16sp"
-        android:textColor="#424242"
+        android:textColor="@color/colorSecondaryText"
         android:layout_marginBottom="48dp"/>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -32,11 +32,11 @@
         android:layout_height="wrap_content"
         android:hint="Email"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        app:boxStrokeColor="#333333"
-        app:hintTextColor="#333333"
-        android:textColorHint="#555555"
+        app:boxStrokeColor="@color/colorInputStroke"
+        app:hintTextColor="@color/colorInputStroke"
+        android:textColorHint="@color/colorInputHint"
         app:startIconDrawable="@android:drawable/ic_dialog_email"
-        app:startIconTint="#555555"
+        app:startIconTint="@color/colorInputHint"
         android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -44,7 +44,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textEmailAddress"
-            android:textColor="#212121"
+            android:textColor="@color/colorPrimaryText"
             android:maxLines="1"/>
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -53,13 +53,13 @@
         android:layout_height="wrap_content"
         android:hint="Password"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        app:boxStrokeColor="#333333"
-        app:hintTextColor="#333333"
-        android:textColorHint="#555555"
+        app:boxStrokeColor="@color/colorInputStroke"
+        app:hintTextColor="@color/colorInputStroke"
+        android:textColorHint="@color/colorInputHint"
         app:endIconMode="password_toggle"
-        app:endIconTint="#555555"
+        app:endIconTint="@color/colorInputHint"
         app:startIconDrawable="@android:drawable/ic_lock_idle_lock"
-        app:startIconTint="#555555"
+        app:startIconTint="@color/colorInputHint"
         android:layout_marginBottom="32dp">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -67,7 +67,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
-            android:textColor="#212121"
+            android:textColor="@color/colorPrimaryText"
             android:maxLines="1"/>
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -81,8 +81,8 @@
         android:textAllCaps="false"
         android:letterSpacing="0.02"
         app:cornerRadius="8dp"
-        android:backgroundTint="#212121"
-        android:textColor="#FFFFFF"
+        android:backgroundTint="@color/colorButton"
+        android:textColor="@color/colorButtonText"
         android:layout_marginBottom="24dp"/>
 
     <TextView
@@ -92,6 +92,6 @@
         android:text="Don't have an account? Register"
         android:textSize="15sp"
         android:textStyle="bold"
-        android:textColor="#424242"/>
+        android:textColor="@color/colorSecondaryText"/>
 
 </LinearLayout>

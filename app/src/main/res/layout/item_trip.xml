@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     android:elevation="4dp"
-    android:backgroundTint="#FAFAFA">
+    android:backgroundTint="@color/colorCard">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -25,7 +25,7 @@
                 android:text="Yerevan -> Masis"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#000000"/>
+                android:textColor="@color/colorPrimaryText"/>
 
             <TextView
                 android:id="@+id/tvPrice"
@@ -34,7 +34,7 @@
                 android:text="500 AMD"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#4CAF50"/>
+                android:textColor="@color/colorPriceText"/>
         </LinearLayout>
 
         <TextView
@@ -42,6 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Date &amp; Time"
+            android:textColor="@color/colorSecondaryText"
             android:layout_marginTop="5dp"/>
 
         <TextView
@@ -50,6 +51,7 @@
             android:layout_height="wrap_content"
             android:text="Driver Name • Car Model"
             android:textStyle="italic"
+            android:textColor="@color/colorSecondaryText"
             android:layout_marginTop="5dp"/>
 
         <LinearLayout
@@ -65,15 +67,15 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="3 seats left"
-                android:textColor="#FF5722"/>
+                android:textColor="@color/colorSeatsText"/>
 
             <Button
                 android:id="@+id/btnBook"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="BOOK"
-                android:backgroundTint="#000000"
-                android:textColor="#FFFFFF"/>
+                android:backgroundTint="@color/colorButton"
+                android:textColor="@color/colorButtonText"/>
         </LinearLayout>
 
     </LinearLayout>

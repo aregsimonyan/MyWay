@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="#FFFFFF">
+    android:background="@color/colorBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,7 +20,7 @@
             android:text="Create Account"
             android:textSize="32sp"
             android:textStyle="bold"
-            android:textColor="#000000"
+            android:textColor="@color/colorPrimaryText"
             android:fontFamily="sans-serif-medium"
             android:layout_marginBottom="8dp"/>
 
@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:text="Sign up to start your journey"
             android:textSize="16sp"
-            android:textColor="#333333"
+            android:textColor="@color/colorSecondaryText"
             android:layout_marginBottom="32dp"/>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -37,9 +37,9 @@
             android:layout_height="wrap_content"
             android:hint="Full Name"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:boxStrokeColor="#000000"
-            app:hintTextColor="#000000"
-            android:textColorHint="#424242"
+            app:boxStrokeColor="@color/colorInputStroke"
+            app:hintTextColor="@color/colorInputStroke"
+            android:textColorHint="@color/colorInputHint"
             android:layout_marginBottom="16dp">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -47,7 +47,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
-                android:textColor="#000000"/>
+                android:textColor="@color/colorPrimaryText"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -55,9 +55,9 @@
             android:layout_height="wrap_content"
             android:hint="Email Address"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:boxStrokeColor="#000000"
-            app:hintTextColor="#000000"
-            android:textColorHint="#424242"
+            app:boxStrokeColor="@color/colorInputStroke"
+            app:hintTextColor="@color/colorInputStroke"
+            android:textColorHint="@color/colorInputHint"
             android:layout_marginBottom="16dp">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -65,7 +65,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
-                android:textColor="#000000"/>
+                android:textColor="@color/colorPrimaryText"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -73,9 +73,9 @@
             android:layout_height="wrap_content"
             android:hint="Phone Number"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:boxStrokeColor="#000000"
-            app:hintTextColor="#000000"
-            android:textColorHint="#424242"
+            app:boxStrokeColor="@color/colorInputStroke"
+            app:hintTextColor="@color/colorInputStroke"
+            android:textColorHint="@color/colorInputHint"
             android:layout_marginBottom="16dp">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -83,7 +83,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="phone"
-                android:textColor="#000000"/>
+                android:textColor="@color/colorPrimaryText"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -92,9 +92,9 @@
             android:hint="Password"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             app:endIconMode="password_toggle"
-            app:boxStrokeColor="#000000"
-            app:hintTextColor="#000000"
-            android:textColorHint="#424242"
+            app:boxStrokeColor="@color/colorInputStroke"
+            app:hintTextColor="@color/colorInputStroke"
+            android:textColorHint="@color/colorInputHint"
             android:layout_marginBottom="24dp">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -102,7 +102,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
-                android:textColor="#000000"/>
+                android:textColor="@color/colorPrimaryText"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
@@ -112,7 +112,7 @@
             android:textSize="14sp"
             android:textAllCaps="true"
             android:letterSpacing="0.05"
-            android:textColor="#212121"
+            android:textColor="@color/colorPrimaryText"
             android:textStyle="bold"
             android:layout_marginBottom="12dp"/>
 
@@ -130,8 +130,8 @@
                 android:layout_weight="1"
                 android:text="Passenger"
                 android:checked="true"
-                android:textColor="#212121"
-                android:buttonTint="#000000"
+                android:textColor="@color/colorPrimaryText"
+                android:buttonTint="@color/colorPrimaryText"
                 android:textSize="16sp"/>
 
             <com.google.android.material.radiobutton.MaterialRadioButton
@@ -140,11 +140,12 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Driver"
-                android:textColor="#212121"
-                android:buttonTint="#000000"
+                android:textColor="@color/colorPrimaryText"
+                android:buttonTint="@color/colorPrimaryText"
                 android:textSize="16sp"/>
         </RadioGroup>
 
+        <!-- Driver-only fields, hidden by default -->
         <LinearLayout
             android:id="@+id/driverFieldsLayout"
             android:layout_width="match_parent"
@@ -159,7 +160,7 @@
                 android:text="Vehicle Details"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#000000"
+                android:textColor="@color/colorPrimaryText"
                 android:layout_marginBottom="16dp"/>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -167,11 +168,11 @@
                 android:layout_height="wrap_content"
                 android:hint="Car Model"
                 app:helperText="e.g. Opel Astra"
-                app:helperTextTextColor="#424242"
+                app:helperTextTextColor="@color/colorInputHint"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                app:boxStrokeColor="#000000"
-                app:hintTextColor="#000000"
-                android:textColorHint="#424242"
+                app:boxStrokeColor="@color/colorInputStroke"
+                app:hintTextColor="@color/colorInputStroke"
+                android:textColorHint="@color/colorInputHint"
                 android:layout_marginBottom="16dp">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -179,7 +180,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textCapWords"
-                    android:textColor="#000000"/>
+                    android:textColor="@color/colorPrimaryText"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -187,11 +188,11 @@
                 android:layout_height="wrap_content"
                 android:hint="License Plate"
                 app:helperText="e.g. 35 XX 777"
-                app:helperTextTextColor="#424242"
+                app:helperTextTextColor="@color/colorInputHint"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                app:boxStrokeColor="#000000"
-                app:hintTextColor="#000000"
-                android:textColorHint="#424242"
+                app:boxStrokeColor="@color/colorInputStroke"
+                app:hintTextColor="@color/colorInputStroke"
+                android:textColorHint="@color/colorInputHint"
                 android:layout_marginBottom="24dp">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -199,7 +200,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textCapCharacters"
-                    android:textColor="#000000"/>
+                    android:textColor="@color/colorPrimaryText"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
@@ -209,7 +210,7 @@
                 android:textSize="14sp"
                 android:textAllCaps="true"
                 android:letterSpacing="0.05"
-                android:textColor="#212121"
+                android:textColor="@color/colorPrimaryText"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp"/>
 
@@ -225,8 +226,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Economy"
-                    android:textColor="#212121"
-                    android:buttonTint="#000000"
+                    android:textColor="@color/colorPrimaryText"
+                    android:buttonTint="@color/colorPrimaryText"
                     android:padding="8dp"
                     android:checked="true"/>
 
@@ -235,8 +236,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Comfort"
-                    android:textColor="#212121"
-                    android:buttonTint="#000000"
+                    android:textColor="@color/colorPrimaryText"
+                    android:buttonTint="@color/colorPrimaryText"
                     android:padding="8dp"/>
 
                 <com.google.android.material.radiobutton.MaterialRadioButton
@@ -244,8 +245,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Business"
-                    android:textColor="#212121"
-                    android:buttonTint="#000000"
+                    android:textColor="@color/colorPrimaryText"
+                    android:buttonTint="@color/colorPrimaryText"
                     android:padding="8dp"/>
             </RadioGroup>
 
@@ -261,8 +262,8 @@
             android:letterSpacing="0.02"
             android:textStyle="bold"
             app:cornerRadius="8dp"
-            android:backgroundTint="#000000"
-            android:textColor="#FFFFFF"
+            android:backgroundTint="@color/colorButton"
+            android:textColor="@color/colorButtonText"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="20dp"/>
 

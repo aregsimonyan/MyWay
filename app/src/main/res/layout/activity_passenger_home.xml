@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="24dp"
-    android:background="#FFFFFF">
+    android:background="@color/colorBackground">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -19,7 +19,7 @@
             android:text="Find a Ride"
             android:textSize="32sp"
             android:textStyle="bold"
-            android:textColor="#212121"
+            android:textColor="@color/colorPrimaryText"
             android:fontFamily="sans-serif-black"
             android:letterSpacing="-0.02"
             android:layout_centerVertical="true"/>
@@ -41,9 +41,9 @@
         android:layout_height="wrap_content"
         app:cardCornerRadius="12dp"
         app:cardElevation="0dp"
-        app:strokeColor="#E0E0E0"
+        app:strokeColor="@color/colorCardBorder"
         app:strokeWidth="1dp"
-        app:cardBackgroundColor="#FFFFFF"
+        app:cardBackgroundColor="@color/colorCard"
         android:layout_marginBottom="24dp">
 
         <LinearLayout
@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:text="Pickup Location"
                 android:textSize="12sp"
-                android:textColor="#757575"
+                android:textColor="@color/colorSecondaryText"
                 android:textAllCaps="true"
                 android:textStyle="bold"
                 android:layout_marginBottom="4dp"/>
@@ -71,7 +71,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#EEEEEE"
+                android:background="@color/colorDivider"
                 android:layout_marginBottom="12dp"/>
 
             <TextView
@@ -79,7 +79,7 @@
                 android:layout_height="wrap_content"
                 android:text="Destination"
                 android:textSize="12sp"
-                android:textColor="#757575"
+                android:textColor="@color/colorSecondaryText"
                 android:textAllCaps="true"
                 android:textStyle="bold"
                 android:layout_marginBottom="4dp"/>
@@ -103,9 +103,9 @@
         app:cornerRadius="8dp"
         app:icon="@android:drawable/ic_menu_search"
         app:iconGravity="textStart"
-        app:iconTint="#FFFFFF"
-        android:backgroundTint="#212121"
-        android:textColor="#FFFFFF"
+        app:iconTint="@color/colorButtonText"
+        android:backgroundTint="@color/colorButton"
+        android:textColor="@color/colorButtonText"
         android:layout_marginBottom="12dp"/>
 
     <com.google.android.material.button.MaterialButton
@@ -120,7 +120,7 @@
         app:icon="@android:drawable/ic_dialog_map"
         app:iconGravity="textStart"
         app:iconTint="#FFFFFF"
-        android:backgroundTint="#1976D2"
+        android:backgroundTint="@color/colorMapButton"
         android:textColor="#FFFFFF"
         android:layout_marginBottom="24dp"/>
 
@@ -130,7 +130,7 @@
         android:text="Available Trips"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:textColor="#212121"
+        android:textColor="@color/colorPrimaryText"
         android:layout_marginBottom="12dp"/>
 
     <androidx.recyclerview.widget.RecyclerView

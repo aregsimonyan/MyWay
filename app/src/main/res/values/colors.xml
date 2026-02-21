@@ -1,10 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="colorBackground">#1E1E1E</color>
+    <color name="colorPageBackground">#1A1A1A</color>
+    <color name="colorSurface">#2A2A2A</color>
+    <color name="colorCard">#2A2A2A</color>
+    <color name="colorCardBorder">#3D3D3D</color>
+    <color name="colorTopBar">#242424</color>
+    <color name="colorTopBarDivider">#333333</color>
+    <color name="colorRowDivider">#333333</color>
+    <color name="colorPrimaryText">#EEEEEE</color>
+    <color name="colorSecondaryText">#AAAAAA</color>
+    <color name="colorSectionLabel">#888888</color>
+    <color name="colorHintText">#777777</color>
+    <color name="colorHintStrong">#555555</color>
+    <color name="colorDivider">#333333</color>
+    <color name="colorButton">#EEEEEE</color>
+    <color name="colorButtonText">#111111</color>
+    <color name="colorInputStroke">#AAAAAA</color>
+    <color name="colorInputHint">#AAAAAA</color>
+    <color name="colorIcon">#AAAAAA</color>
+    <color name="colorSeatsText">#FF7043</color>
+    <color name="colorPriceText">#66BB6A</color>
+    <color name="colorMapButton">#1E88E5</color>
 </resources>
