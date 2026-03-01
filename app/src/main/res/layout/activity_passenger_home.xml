@@ -11,18 +11,18 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp">
+        android:layout_marginBottom="50dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Find a Ride"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            android:textColor="@color/colorPrimaryText"
+            android:layout_centerVertical="true"
             android:fontFamily="sans-serif-black"
             android:letterSpacing="-0.02"
-            android:layout_centerVertical="true"/>
+            android:text="Find your Ride"
+            android:textColor="@color/colorPrimaryText"
+            android:textSize="32sp"
+            android:textStyle="bold" />
 
         <ImageButton
             android:id="@+id/btnMore"
@@ -30,9 +30,9 @@
             android:layout_height="48dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/ic_more_vert"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="More options"/>
+            android:contentDescription="More options"
+            android:src="@drawable/ic_more_vert" />
 
     </RelativeLayout>
 

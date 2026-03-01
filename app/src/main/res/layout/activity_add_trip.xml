@@ -17,7 +17,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="72dp"
+            android:layout_height="102dp"
             android:paddingHorizontal="8dp">
 
             <TextView
@@ -31,18 +31,6 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="16dp"/>
 
-            <ImageButton
-                android:id="@+id/btnMore"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="4dp"
-                android:src="@drawable/ic_more_vert"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="16dp"
-                android:contentDescription="More options"/>
-
         </RelativeLayout>
 
         <View
@@ -54,10 +42,11 @@
 
     <!-- Scrollable body -->
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -71,21 +60,21 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ROUTE"
-                android:textSize="11sp"
-                android:textColor="@color/colorSectionLabel"
-                android:textStyle="bold"
+                android:layout_marginBottom="10dp"
                 android:letterSpacing="0.12"
-                android:layout_marginBottom="10dp"/>
+                android:text="ROUTE"
+                android:textColor="@color/colorSectionLabel"
+                android:textSize="11sp"
+                android:textStyle="bold" />
 
             <!-- Route card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="28dp"
+                app:cardBackgroundColor="@color/colorCard"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/colorCard">
+                app:cardElevation="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -96,15 +85,15 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="72dp"
-                        android:orientation="horizontal"
                         android:gravity="center_vertical"
+                        android:orientation="horizontal"
                         android:paddingHorizontal="16dp">
 
                         <View
                             android:layout_width="12dp"
                             android:layout_height="12dp"
-                            android:background="@drawable/circle_green"
-                            android:layout_marginEnd="16dp"/>
+                            android:layout_marginEnd="16dp"
+                            android:background="@drawable/circle_green" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -115,17 +104,17 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="FROM"
-                                android:textSize="10sp"
-                                android:textColor="@color/colorHintText"
-                                android:textStyle="bold"
+                                android:layout_marginBottom="4dp"
                                 android:letterSpacing="0.1"
-                                android:layout_marginBottom="4dp"/>
+                                android:text="FROM"
+                                android:textColor="@color/colorHintText"
+                                android:textSize="10sp"
+                                android:textStyle="bold" />
 
                             <Spinner
                                 android:id="@+id/spinnerFrom"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"/>
+                                android:layout_height="wrap_content" />
 
                         </LinearLayout>
                     </LinearLayout>
@@ -133,22 +122,22 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@color/colorRowDivider"
-                        android:layout_marginHorizontal="16dp"/>
+                        android:layout_marginHorizontal="16dp"
+                        android:background="@color/colorRowDivider" />
 
                     <!-- To row -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="72dp"
-                        android:orientation="horizontal"
                         android:gravity="center_vertical"
+                        android:orientation="horizontal"
                         android:paddingHorizontal="16dp">
 
                         <View
                             android:layout_width="12dp"
                             android:layout_height="12dp"
-                            android:background="@drawable/circle_red"
-                            android:layout_marginEnd="16dp"/>
+                            android:layout_marginEnd="16dp"
+                            android:background="@drawable/circle_red" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -159,17 +148,17 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="TO"
-                                android:textSize="10sp"
-                                android:textColor="@color/colorHintText"
-                                android:textStyle="bold"
+                                android:layout_marginBottom="4dp"
                                 android:letterSpacing="0.1"
-                                android:layout_marginBottom="4dp"/>
+                                android:text="TO"
+                                android:textColor="@color/colorHintText"
+                                android:textSize="10sp"
+                                android:textStyle="bold" />
 
                             <Spinner
                                 android:id="@+id/spinnerTo"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"/>
+                                android:layout_height="wrap_content" />
 
                         </LinearLayout>
                     </LinearLayout>
@@ -181,21 +170,21 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="SCHEDULE"
-                android:textSize="11sp"
-                android:textColor="@color/colorSectionLabel"
-                android:textStyle="bold"
+                android:layout_marginBottom="10dp"
                 android:letterSpacing="0.12"
-                android:layout_marginBottom="10dp"/>
+                android:text="SCHEDULE"
+                android:textColor="@color/colorSectionLabel"
+                android:textSize="11sp"
+                android:textStyle="bold" />
 
             <!-- Schedule card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="28dp"
+                app:cardBackgroundColor="@color/colorCard"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/colorCard">
+                app:cardElevation="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -206,15 +195,15 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="72dp"
-                        android:orientation="horizontal"
                         android:gravity="center_vertical"
+                        android:orientation="horizontal"
                         android:paddingHorizontal="16dp">
 
                         <ImageView
                             android:layout_width="22dp"
                             android:layout_height="22dp"
-                            android:src="@android:drawable/ic_menu_today"
-                            android:layout_marginEnd="16dp"/>
+                            android:layout_marginEnd="16dp"
+                            android:src="@android:drawable/ic_menu_today" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -225,25 +214,25 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="DATE"
-                                android:textSize="10sp"
-                                android:textColor="@color/colorHintText"
-                                android:textStyle="bold"
+                                android:layout_marginBottom="4dp"
                                 android:letterSpacing="0.1"
-                                android:layout_marginBottom="4dp"/>
+                                android:text="DATE"
+                                android:textColor="@color/colorHintText"
+                                android:textSize="10sp"
+                                android:textStyle="bold" />
 
                             <EditText
                                 android:id="@+id/etDate"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Tap to pick a date"
-                                android:textColorHint="@color/colorHintStrong"
-                                android:textColor="@color/colorPrimaryText"
-                                android:textSize="15sp"
                                 android:background="@null"
                                 android:focusable="false"
+                                android:hint="Tap to pick a date"
                                 android:inputType="none"
-                                android:maxLines="1"/>
+                                android:maxLines="1"
+                                android:textColor="@color/colorPrimaryText"
+                                android:textColorHint="@color/colorHintStrong"
+                                android:textSize="15sp" />
 
                         </LinearLayout>
                     </LinearLayout>
@@ -251,22 +240,22 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@color/colorRowDivider"
-                        android:layout_marginHorizontal="16dp"/>
+                        android:layout_marginHorizontal="16dp"
+                        android:background="@color/colorRowDivider" />
 
                     <!-- Time row -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="72dp"
-                        android:orientation="horizontal"
                         android:gravity="center_vertical"
+                        android:orientation="horizontal"
                         android:paddingHorizontal="16dp">
 
                         <ImageView
                             android:layout_width="22dp"
                             android:layout_height="22dp"
-                            android:src="@android:drawable/ic_menu_recent_history"
-                            android:layout_marginEnd="16dp"/>
+                            android:layout_marginEnd="16dp"
+                            android:src="@android:drawable/ic_menu_recent_history" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -277,25 +266,25 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="TIME"
-                                android:textSize="10sp"
-                                android:textColor="@color/colorHintText"
-                                android:textStyle="bold"
+                                android:layout_marginBottom="4dp"
                                 android:letterSpacing="0.1"
-                                android:layout_marginBottom="4dp"/>
+                                android:text="TIME"
+                                android:textColor="@color/colorHintText"
+                                android:textSize="10sp"
+                                android:textStyle="bold" />
 
                             <EditText
                                 android:id="@+id/etTime"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Tap to pick a time"
-                                android:textColorHint="@color/colorHintStrong"
-                                android:textColor="@color/colorPrimaryText"
-                                android:textSize="15sp"
                                 android:background="@null"
                                 android:focusable="false"
+                                android:hint="Tap to pick a time"
                                 android:inputType="none"
-                                android:maxLines="1"/>
+                                android:maxLines="1"
+                                android:textColor="@color/colorPrimaryText"
+                                android:textColorHint="@color/colorHintStrong"
+                                android:textSize="15sp" />
 
                         </LinearLayout>
                     </LinearLayout>
@@ -307,21 +296,21 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="DETAILS"
-                android:textSize="11sp"
-                android:textColor="@color/colorSectionLabel"
-                android:textStyle="bold"
+                android:layout_marginBottom="10dp"
                 android:letterSpacing="0.12"
-                android:layout_marginBottom="10dp"/>
+                android:text="DETAILS"
+                android:textColor="@color/colorSectionLabel"
+                android:textSize="11sp"
+                android:textStyle="bold" />
 
             <!-- Details card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="36dp"
+                app:cardBackgroundColor="@color/colorCard"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/colorCard">
+                app:cardElevation="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -332,18 +321,18 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="72dp"
-                        android:orientation="horizontal"
                         android:gravity="center_vertical"
+                        android:orientation="horizontal"
                         android:paddingHorizontal="16dp">
 
                         <TextView
                             android:layout_width="22dp"
                             android:layout_height="22dp"
-                            android:text="֏"
-                            android:textSize="18sp"
-                            android:textColor="@color/colorIcon"
+                            android:layout_marginEnd="16dp"
                             android:gravity="center"
-                            android:layout_marginEnd="16dp"/>
+                            android:text="֏"
+                            android:textColor="@color/colorIcon"
+                            android:textSize="18sp" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -354,24 +343,24 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="PRICE PER SEAT (AMD)"
-                                android:textSize="10sp"
-                                android:textColor="@color/colorHintText"
-                                android:textStyle="bold"
+                                android:layout_marginBottom="4dp"
                                 android:letterSpacing="0.1"
-                                android:layout_marginBottom="4dp"/>
+                                android:text="PRICE PER SEAT (AMD)"
+                                android:textColor="@color/colorHintText"
+                                android:textSize="10sp"
+                                android:textStyle="bold" />
 
                             <EditText
                                 android:id="@+id/etPrice"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="e.g. 500"
-                                android:textColorHint="@color/colorHintStrong"
-                                android:textColor="@color/colorPrimaryText"
-                                android:textSize="15sp"
                                 android:background="@null"
+                                android:hint="e.g. 500"
                                 android:inputType="numberDecimal"
-                                android:maxLines="1"/>
+                                android:maxLines="1"
+                                android:textColor="@color/colorPrimaryText"
+                                android:textColorHint="@color/colorHintStrong"
+                                android:textSize="15sp" />
 
                         </LinearLayout>
                     </LinearLayout>
@@ -379,22 +368,22 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@color/colorRowDivider"
-                        android:layout_marginHorizontal="16dp"/>
+                        android:layout_marginHorizontal="16dp"
+                        android:background="@color/colorRowDivider" />
 
                     <!-- Seats row -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="72dp"
-                        android:orientation="horizontal"
                         android:gravity="center_vertical"
+                        android:orientation="horizontal"
                         android:paddingHorizontal="16dp">
 
                         <ImageView
                             android:layout_width="22dp"
                             android:layout_height="22dp"
-                            android:src="@android:drawable/ic_menu_my_calendar"
-                            android:layout_marginEnd="16dp"/>
+                            android:layout_marginEnd="16dp"
+                            android:src="@android:drawable/ic_menu_my_calendar" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -405,24 +394,24 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="AVAILABLE SEATS (1–4)"
-                                android:textSize="10sp"
-                                android:textColor="@color/colorHintText"
-                                android:textStyle="bold"
+                                android:layout_marginBottom="4dp"
                                 android:letterSpacing="0.1"
-                                android:layout_marginBottom="4dp"/>
+                                android:text="AVAILABLE SEATS (1–4)"
+                                android:textColor="@color/colorHintText"
+                                android:textSize="10sp"
+                                android:textStyle="bold" />
 
                             <EditText
                                 android:id="@+id/etSeats"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="e.g. 3"
-                                android:textColorHint="@color/colorHintStrong"
-                                android:textColor="@color/colorPrimaryText"
-                                android:textSize="15sp"
                                 android:background="@null"
+                                android:hint="e.g. 3"
                                 android:inputType="number"
-                                android:maxLines="1"/>
+                                android:maxLines="1"
+                                android:textColor="@color/colorPrimaryText"
+                                android:textColorHint="@color/colorHintStrong"
+                                android:textSize="15sp" />
 
                         </LinearLayout>
                     </LinearLayout>
@@ -435,15 +424,27 @@
                 android:id="@+id/btnPublish"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="Publish Ride"
-                android:textSize="17sp"
-                android:textAllCaps="false"
-                android:textStyle="bold"
-                android:textColor="@color/colorButtonText"
                 android:backgroundTint="@color/colorButton"
-                app:cornerRadius="14dp"/>
+                android:text="Publish Ride"
+                android:textAllCaps="false"
+                android:textColor="@color/colorButtonText"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                app:cornerRadius="14dp" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <ImageButton
+        android:id="@+id/btnMore"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginEnd="9dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="More options"
+        android:padding="16dp"
+        android:src="@drawable/ic_more_vert"
+        app:layout_anchor="@+id/appBarLayout"
+        app:layout_anchorGravity="end|center" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
