@@ -90,7 +90,8 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful() && task.getResult() != null) {
+                        if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
+
                             String userType = task.getResult().getString("userType");
                             Boolean isBanned = task.getResult().getBoolean("banned");
 
@@ -106,6 +107,10 @@ public class LoginActivity extends AppCompatActivity {
                                 startActivity(new Intent(LoginActivity.this, PassengerHomeActivity.class));
                             }
                             finish();
+
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Account data not found. Please register again.", Toast.LENGTH_LONG).show();
+                            mAuth.signOut();
                         }
                     }
                 });
