@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="tvPhoneDisplay" type="id" />
+    <item name="btnVerify" type="id" />
+    <item name="tvCountdown" type="id" />
+    <item name="tvResend" type="id" />
+    <item name="etOtpCode" type="id" />
+</resources>

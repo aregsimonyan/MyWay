@@ -1,97 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:gravity="center"
+    android:fillViewport="true"
     android:background="@color/colorBackground">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="MyWay"
-        android:textSize="40sp"
-        android:textStyle="bold"
-        android:textColor="@color/colorPrimaryText"
-        android:fontFamily="sans-serif-black"
-        android:letterSpacing="-0.02"
-        android:layout_marginBottom="8dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Welcome back, please login."
-        android:textSize="16sp"
-        android:textColor="@color/colorSecondaryText"
-        android:layout_marginBottom="48dp"/>
-
-    <com.google.android.material.textfield.TextInputLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Email"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        app:boxStrokeColor="@color/colorInputStroke"
-        app:hintTextColor="@color/colorInputStroke"
-        android:textColorHint="@color/colorInputHint"
-        app:startIconDrawable="@android:drawable/ic_dialog_email"
-        app:startIconTint="@color/colorInputHint"
-        android:layout_marginBottom="16dp">
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etLoginEmail"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MyWay"
+            android:textSize="40sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimaryText"
+            android:fontFamily="sans-serif-black"
+            android:letterSpacing="-0.02"
+            android:layout_marginTop="48dp"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome back, please log in."
+            android:textSize="16sp"
+            android:textColor="@color/colorSecondaryText"
+            android:layout_marginBottom="48dp"/>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textEmailAddress"
-            android:textColor="@color/colorPrimaryText"
-            android:maxLines="1"/>
-    </com.google.android.material.textfield.TextInputLayout>
+            android:hint="Email"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:boxStrokeColor="@color/colorInputStroke"
+            app:hintTextColor="@color/colorInputStroke"
+            android:textColorHint="@color/colorInputHint"
+            app:startIconDrawable="@android:drawable/ic_dialog_email"
+            app:startIconTint="@color/colorInputHint"
+            android:layout_marginBottom="16dp">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Password"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        app:boxStrokeColor="@color/colorInputStroke"
-        app:hintTextColor="@color/colorInputStroke"
-        android:textColorHint="@color/colorInputHint"
-        app:endIconMode="password_toggle"
-        app:endIconTint="@color/colorInputHint"
-        app:startIconDrawable="@android:drawable/ic_lock_idle_lock"
-        app:startIconTint="@color/colorInputHint"
-        android:layout_marginBottom="32dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etLoginEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"
+                android:textColor="@color/colorPrimaryText"
+                android:maxLines="1"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etLoginPassword"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:textColor="@color/colorPrimaryText"
-            android:maxLines="1"/>
-    </com.google.android.material.textfield.TextInputLayout>
+            android:hint="Password"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:boxStrokeColor="@color/colorInputStroke"
+            app:hintTextColor="@color/colorInputStroke"
+            android:textColorHint="@color/colorInputHint"
+            app:endIconMode="password_toggle"
+            app:endIconTint="@color/colorInputHint"
+            app:startIconDrawable="@android:drawable/ic_lock_idle_lock"
+            app:startIconTint="@color/colorInputHint"
+            android:layout_marginBottom="32dp">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnLogin"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:text="Login"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textAllCaps="false"
-        android:letterSpacing="0.02"
-        app:cornerRadius="8dp"
-        android:backgroundTint="@color/colorButton"
-        android:textColor="@color/colorButtonText"
-        android:layout_marginBottom="24dp"/>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etLoginPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:textColor="@color/colorPrimaryText"
+                android:maxLines="1"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <TextView
-        android:id="@+id/tvGoToRegister"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Don't have an account? Register"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        android:textColor="@color/colorSecondaryText"/>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Log In"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            android:letterSpacing="0.02"
+            app:cornerRadius="8dp"
+            android:backgroundTint="@color/colorButton"
+            android:textColor="@color/colorButtonText"
+            android:layout_marginBottom="24dp"/>
 
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"
+                android:background="@color/colorDivider"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="  OR  "
+                android:textColor="@color/colorSecondaryText"
+                android:textSize="13sp"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"
+                android:background="@color/colorDivider"/>
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGoogleSignIn"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Continue with Google"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            android:textColor="#111111"
+            app:cornerRadius="8dp"
+            android:backgroundTint="#FFFFFF"
+            app:strokeColor="#DADCE0"
+            app:strokeWidth="1dp"
+            android:layout_marginBottom="32dp"/>
+
+        <TextView
+            android:id="@+id/tvGoToRegister"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Don't have an account? Register"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorSecondaryText"
+            android:layout_marginBottom="32dp"/>
+
+    </LinearLayout>
+</ScrollView>

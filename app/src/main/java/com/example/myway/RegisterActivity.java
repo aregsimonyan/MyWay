@@ -1,7 +1,7 @@
 package com.example.myway;
 
+import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -10,140 +10,107 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
-import androidx.annotation.NonNull;
-import com.example.myway.models.User;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText etName, etEmail, etPhone, etPassword, etCarModel, etLicensePlate;
     private RadioGroup rgUserType, rgCarCategory;
-    private RadioButton rbDriver, rbEconomy, rbComfort, rbBusiness;
+    private RadioButton rbDriver, rbComfort, rbBusiness;
     private LinearLayout driverFieldsLayout;
     private Button btnRegister;
-
-    private FirebaseAuth mAuth;
-    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+        bindViews();
 
-        etName = findViewById(R.id.etName);
-        etEmail = findViewById(R.id.etEmail);
-        etPhone = findViewById(R.id.etPhone);
-        etPassword = findViewById(R.id.etPassword);
-        etCarModel = findViewById(R.id.etCarModel);
-        etLicensePlate = findViewById(R.id.etLicensePlate);
-
-        rgUserType = findViewById(R.id.rgUserType);
-        rgCarCategory = findViewById(R.id.rgCarCategory);
-
-        rbDriver = findViewById(R.id.rbDriver);
-        rbEconomy = findViewById(R.id.rbEconomy);
-        rbComfort = findViewById(R.id.rbComfort);
-        rbBusiness = findViewById(R.id.rbBusiness);
-
-        driverFieldsLayout = findViewById(R.id.driverFieldsLayout);
-        btnRegister = findViewById(R.id.btnRegister);
-
-        rgUserType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.rbDriver) {
-                    driverFieldsLayout.setVisibility(View.VISIBLE);
-                } else {
-                    driverFieldsLayout.setVisibility(View.GONE);
-                }
-            }
+        rgUserType.setOnCheckedChangeListener((group, checkedId) -> {
+            driverFieldsLayout.setVisibility(
+                    checkedId == R.id.rbDriver ? View.VISIBLE : View.GONE
+            );
         });
 
-        btnRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                registerUser();
-            }
-        });
+        btnRegister.setOnClickListener(v -> validateAndProceed());
     }
 
-    private void registerUser() {
-        String name = etName.getText().toString().trim();
-        String email = etEmail.getText().toString().trim();
-        String phone = etPhone.getText().toString().trim();
+    private void bindViews() {
+        etName          = findViewById(R.id.etName);
+        etEmail         = findViewById(R.id.etEmail);
+        etPhone         = findViewById(R.id.etPhone);
+        etPassword      = findViewById(R.id.etPassword);
+        etCarModel      = findViewById(R.id.etCarModel);
+        etLicensePlate  = findViewById(R.id.etLicensePlate);
+        rgUserType      = findViewById(R.id.rgUserType);
+        rgCarCategory   = findViewById(R.id.rgCarCategory);
+        rbDriver        = findViewById(R.id.rbDriver);
+        rbComfort       = findViewById(R.id.rbComfort);
+        rbBusiness      = findViewById(R.id.rbBusiness);
+        driverFieldsLayout = findViewById(R.id.driverFieldsLayout);
+        btnRegister     = findViewById(R.id.btnRegister);
+    }
+
+    private void validateAndProceed() {
+        String name     = etName.getText().toString().trim();
+        String email    = etEmail.getText().toString().trim();
+        String phone    = etPhone.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
         boolean isDriver = rbDriver.isChecked();
 
-        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+        if (TextUtils.isEmpty(name)) {
+            etName.setError("Name is required");
             return;
         }
-
+        if (TextUtils.isEmpty(email)) {
+            etEmail.setError("Email is required");
+            return;
+        }
+        if (TextUtils.isEmpty(phone)) {
+            etPhone.setError("Phone number is required");
+            return;
+        }
+        if (TextUtils.isEmpty(password)) {
+            etPassword.setError("Password is required");
+            return;
+        }
         if (password.length() < 6) {
-            Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
+            etPassword.setError("Password must be at least 6 characters");
             return;
         }
-
         if (isDriver) {
-            if (TextUtils.isEmpty(etCarModel.getText()) || TextUtils.isEmpty(etLicensePlate.getText())) {
-                Toast.makeText(this, "Drivers must fill car details", Toast.LENGTH_SHORT).show();
+            if (TextUtils.isEmpty(etCarModel.getText())) {
+                etCarModel.setError("Car model is required for drivers");
+                return;
+            }
+            if (TextUtils.isEmpty(etLicensePlate.getText())) {
+                etLicensePlate.setError("License plate is required for drivers");
                 return;
             }
         }
 
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            FirebaseUser firebaseUser = mAuth.getCurrentUser();
-                            saveUserToFirestore(firebaseUser);
-                        } else {
-                            Toast.makeText(RegisterActivity.this, "Registration Failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-    }
+        String userType = isDriver ? "Driver" : "Passenger";
+        String carModel = isDriver ? etCarModel.getText().toString().trim() : "";
+        String licensePlate = isDriver ? etLicensePlate.getText().toString().trim() : "";
 
-    private void saveUserToFirestore(FirebaseUser firebaseUser) {
-        String uid = firebaseUser.getUid();
-        String name = etName.getText().toString().trim();
-        String email = etEmail.getText().toString().trim();
-        String phone = etPhone.getText().toString().trim();
-        String userType = rbDriver.isChecked() ? "Driver" : "Passenger";
+        String carCategory = "Economy";
+        if (rbComfort.isChecked()) carCategory = "Comfort";
+        if (rbBusiness.isChecked()) carCategory = "Business";
 
-        User newUser = new User(uid, name, email, phone, userType);
-
-        if (userType.equals("Driver")) {
-            newUser.setCarModel(etCarModel.getText().toString().trim());
-            newUser.setLicensePlate(etLicensePlate.getText().toString().trim());
-
-            String category = "Economy";
-            if (rbComfort.isChecked()) category = "Comfort";
-            if (rbBusiness.isChecked()) category = "Business";
-
-            newUser.setCarCategory(category);
-        }
-
-        db.collection("users").document(uid).set(newUser)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(RegisterActivity.this, "Account Created!", Toast.LENGTH_SHORT).show();
-                            finish();
-                        } else {
-                            Toast.makeText(RegisterActivity.this, "Database Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+        // All fields are valid — launch phone verification.
+        // The actual Firebase account is created AFTER the phone is verified.
+        Intent intent = new Intent(this, PhoneVerificationActivity.class);
+        intent.putExtra("mode",         "email");
+        intent.putExtra("phone",        phone);
+        intent.putExtra("name",         name);
+        intent.putExtra("email",        email);
+        intent.putExtra("password",     password);
+        intent.putExtra("userType",     userType);
+        intent.putExtra("carModel",     carModel);
+        intent.putExtra("licensePlate", licensePlate);
+        intent.putExtra("carCategory",  carCategory);
+        startActivity(intent);
     }
 }

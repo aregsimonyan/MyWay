@@ -10,11 +10,15 @@ import android.widget.PopupMenu;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Locale;
 
 public abstract class MenuActivity extends AppCompatActivity {
+
     protected void setupMoreButton(ImageButton btnMore) {
         btnMore.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(this, v);
@@ -40,7 +44,6 @@ public abstract class MenuActivity extends AppCompatActivity {
         });
     }
 
-
     protected void showLogoutConfirmation() {
         new AlertDialog.Builder(this)
                 .setTitle("Sign Out")
@@ -52,12 +55,18 @@ public abstract class MenuActivity extends AppCompatActivity {
 
     private void performLogout() {
         FirebaseAuth.getInstance().signOut();
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(this, gso);
+        googleSignInClient.signOut();
+
         Intent intent = new Intent(this, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }
-
 
     protected void showLanguageDialog() {
         final String[] languages = {"English", "Русский", "Հայերեն"};
