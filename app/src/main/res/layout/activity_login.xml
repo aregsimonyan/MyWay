@@ -13,25 +13,34 @@
         android:padding="24dp"
         android:gravity="center">
 
+        <ImageView
+            android:id="@+id/imgLogo"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:src="@drawable/myway_logo_circle"
+            android:contentDescription="MyWay Logo"
+            android:layout_marginTop="48dp"
+            android:layout_marginBottom="12dp"
+            android:scaleType="fitCenter"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="MyWay"
-            android:textSize="40sp"
+            android:textSize="36sp"
             android:textStyle="bold"
             android:textColor="@color/colorPrimaryText"
             android:fontFamily="sans-serif-black"
             android:letterSpacing="-0.02"
-            android:layout_marginTop="48dp"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="6dp"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Welcome back, please log in."
-            android:textSize="16sp"
+            android:textSize="15sp"
             android:textColor="@color/colorSecondaryText"
-            android:layout_marginBottom="48dp"/>
+            android:layout_marginBottom="40dp"/>
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
