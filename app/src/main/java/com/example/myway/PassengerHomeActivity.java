@@ -32,8 +32,12 @@ import java.util.List;
 
 public class PassengerHomeActivity extends MenuActivity {
 
-    private Spinner spinnerFrom, spinnerTo;
-    private Button btnSearch, btnMap;
+    private Spinner spinnerFrom;
+    private Spinner spinnerTo;
+    private Button btnSearch;
+    private Button btnMap;
+    private Button btnPostRequest;
+    private Button btnMyRequests;
     private ImageButton btnMore;
     private RecyclerView recyclerView;
     private TripAdapter adapter;
@@ -67,6 +71,8 @@ public class PassengerHomeActivity extends MenuActivity {
         spinnerTo = findViewById(R.id.spinnerSearchTo);
         btnSearch = findViewById(R.id.btnSearch);
         btnMap = findViewById(R.id.btnOpenMap);
+        btnPostRequest = findViewById(R.id.btnPostRequest);
+        btnMyRequests = findViewById(R.id.btnMyRequests);
         btnMore = findViewById(R.id.btnMore);
         recyclerView = findViewById(R.id.recyclerViewTrips);
         tripList = new ArrayList<>();
@@ -103,6 +109,21 @@ public class PassengerHomeActivity extends MenuActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(PassengerHomeActivity.this, MapActivity.class));
+            }
+        });
+
+        btnPostRequest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(PassengerHomeActivity.this,
+                        PostPassengerRequestActivity.class));
+            }
+        });
+
+        btnMyRequests.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(PassengerHomeActivity.this, MyRequestsActivity.class));
             }
         });
     }
@@ -150,7 +171,8 @@ public class PassengerHomeActivity extends MenuActivity {
                             }
                             adapter.notifyDataSetChanged();
                             if (tripList.isEmpty()) {
-                                Toast.makeText(PassengerHomeActivity.this, "No trips found.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(PassengerHomeActivity.this,
+                                        "No trips found.", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
@@ -160,7 +182,8 @@ public class PassengerHomeActivity extends MenuActivity {
     private void confirmBooking(Trip trip) {
         new AlertDialog.Builder(this)
                 .setTitle("Confirm Booking")
-                .setMessage("Book a seat to " + trip.getToLocation() + " for " + trip.getPricePerSeat() + " AMD?")
+                .setMessage("Book a seat to " + trip.getToLocation()
+                        + " for " + (int) trip.getPricePerSeat() + " AMD?")
                 .setPositiveButton("Yes", (dialog, which) -> executeBooking(trip))
                 .setNegativeButton("No", null)
                 .show();
@@ -174,10 +197,11 @@ public class PassengerHomeActivity extends MenuActivity {
             @Override
             public Void apply(@NonNull Transaction transaction) throws FirebaseFirestoreException {
                 DocumentSnapshot snapshot = transaction.get(tripRef);
-                double newSeats = snapshot.getLong("seatsAvailable") - 1;
+                long newSeats = snapshot.getLong("seatsAvailable") - 1;
 
                 if (newSeats < 0) {
-                    throw new FirebaseFirestoreException("Trip is full", FirebaseFirestoreException.Code.ABORTED);
+                    throw new FirebaseFirestoreException("Trip is full",
+                            FirebaseFirestoreException.Code.ABORTED);
                 }
 
                 transaction.update(tripRef, "seatsAvailable", newSeats);
@@ -188,10 +212,13 @@ public class PassengerHomeActivity extends MenuActivity {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Toast.makeText(PassengerHomeActivity.this, "Booking Confirmed!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(PassengerHomeActivity.this,
+                            "Booking Confirmed!", Toast.LENGTH_LONG).show();
                     loadAllTrips();
                 } else {
-                    Toast.makeText(PassengerHomeActivity.this, "Booking Failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PassengerHomeActivity.this,
+                            "Booking Failed: " + task.getException().getMessage(),
+                            Toast.LENGTH_SHORT).show();
                 }
             }
         });

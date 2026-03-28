@@ -1,1 +1,7 @@
 #MyWay
+
+This project requires two secret files that are not included in the repository:
+
+1. Place `google-services.json` inside the `app/` folder
+2. Add your Maps API key to `local.properties`:
+   MAPS_API_KEY=

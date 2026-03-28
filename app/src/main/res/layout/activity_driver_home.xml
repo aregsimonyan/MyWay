@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground">
@@ -21,35 +22,82 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:paddingHorizontal="24dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="8dp"
             android:text="Driver Dashboard"
             android:textColor="@color/colorPrimaryText"
             android:textSize="28sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="48dp"
-            android:text="Ready to give someone a ride?"
+            android:layout_marginBottom="52dp"
+            android:text="Manage your rides and see the live map"
             android:textColor="@color/colorSecondaryText"
-            android:textSize="15sp" />
+            android:textSize="15sp"/>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnPostTrip"
             android:layout_width="match_parent"
             android:layout_height="60dp"
+            android:layout_marginBottom="14dp"
             android:backgroundTint="@color/colorButton"
             android:text="Post a New Ride"
             android:textAllCaps="false"
             android:textColor="@color/colorButtonText"
             android:textSize="17sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            app:cornerRadius="14dp"
+            app:icon="@android:drawable/ic_input_add"
+            app:iconGravity="textStart"
+            app:iconTint="@color/colorButtonText"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnOpenMap"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="10dp"
+                android:text="Live Map"
+                android:textAllCaps="false"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="@color/colorMapButton"
+                app:cornerRadius="14dp"
+                app:icon="@android:drawable/ic_dialog_map"
+                app:iconGravity="textStart"
+                app:iconTint="#FFFFFF"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnMyTrips"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:text="My Trips"
+                android:textAllCaps="false"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorPrimaryText"
+                android:backgroundTint="@color/colorSurface"
+                app:cornerRadius="14dp"
+                app:strokeColor="@color/colorCardBorder"
+                app:strokeWidth="1dp"
+                app:icon="@android:drawable/ic_menu_agenda"
+                app:iconGravity="textStart"
+                app:iconTint="@color/colorPrimaryText"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 

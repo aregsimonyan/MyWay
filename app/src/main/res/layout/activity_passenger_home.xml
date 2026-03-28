@@ -22,7 +22,7 @@
             android:text="Find your Ride"
             android:textColor="@color/colorPrimaryText"
             android:textSize="32sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"/>
 
         <ImageButton
             android:id="@+id/btnMore"
@@ -32,7 +32,7 @@
             android:layout_centerVertical="true"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="More options"
-            android:src="@drawable/ic_more_vert" />
+            android:src="@drawable/ic_more_vert"/>
 
     </RelativeLayout>
 
@@ -108,21 +108,65 @@
         android:textColor="@color/colorButtonText"
         android:layout_marginBottom="12dp"/>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnOpenMap"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:text="Open Live Map"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textAllCaps="false"
-        app:cornerRadius="8dp"
-        app:icon="@android:drawable/ic_dialog_map"
-        app:iconGravity="textStart"
-        app:iconTint="#FFFFFF"
-        android:backgroundTint="@color/colorMapButton"
-        android:textColor="#FFFFFF"
-        android:layout_marginBottom="24dp"/>
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="24dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOpenMap"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Live Map"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            app:cornerRadius="8dp"
+            app:icon="@android:drawable/ic_dialog_map"
+            app:iconGravity="textStart"
+            app:iconTint="#FFFFFF"
+            android:backgroundTint="@color/colorMapButton"
+            android:textColor="#FFFFFF"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPostRequest"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Post Request"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            app:cornerRadius="8dp"
+            app:icon="@android:drawable/ic_input_add"
+            app:iconGravity="textStart"
+            app:iconTint="#111111"
+            android:backgroundTint="#4CAF50"
+            android:textColor="#111111"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnMyRequests"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:text="My Requests"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            app:cornerRadius="8dp"
+            app:icon="@android:drawable/ic_menu_agenda"
+            app:iconGravity="textStart"
+            app:iconTint="@color/colorButtonText"
+            android:backgroundTint="@color/colorSurface"
+            android:textColor="@color/colorPrimaryText"
+            app:strokeColor="@color/colorCardBorder"
+            app:strokeWidth="1dp"/>
+
+    </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"

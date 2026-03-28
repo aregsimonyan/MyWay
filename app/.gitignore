@@ -1,58 +1,15 @@
-# Built application files
-*.apk
-*.aab
-*.ap_
-
-# Files for the ART/Dalvik VM
-*.dex
-
-# Java class files
-*.class
-
-# Generated files
-bin/
-gen/
-out/
-
-# Gradle files
-.gradle/
-build/
-
-# Local configuration file (SDK path, etc.)
-local.properties
-
-# Android Studio / IntelliJ
-.idea/
 *.iml
-*.ipr
-*.iws
-
-# Keystore files (DO NOT commit)
-*.jks
-*.keystore
-
-# Log files
-*.log
-
-# OS files
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
 .DS_Store
-Thumbs.db
-
-# External native build
-.externalNativeBuild/
-.cxx/
-
-# NDK
-obj/
-
-# Lint
-lint/
-lint-results*.txt
-lint-results*.xml
-
-# Emulator / Device
-captures/
-
-# Kotlin (safe even if you’re using Java)
-*.kotlin_module
 /build
+/captures
+.externalNativeBuild
+.cxx
+local.properties

@@ -15,11 +15,18 @@ public class Trip {
     private int seatsAvailable;
     private String carCategory;
     private List<String> passengerIds;
+    private double startLat;
+    private double startLng;
+    private double endLat;
+    private double endLng;
+    private String encodedPolyline;
 
     public Trip() {
     }
 
-    public Trip(String tripId, String driverId, String driverName, String licensePlate, String fromLocation, String toLocation, long dateTime, double pricePerSeat, int totalSeats, String carCategory) {
+    public Trip(String tripId, String driverId, String driverName, String licensePlate,
+                String fromLocation, String toLocation, long dateTime,
+                double pricePerSeat, int totalSeats, String carCategory) {
         this.tripId = tripId;
         this.driverId = driverId;
         this.driverName = driverName;
@@ -33,99 +40,58 @@ public class Trip {
         this.carCategory = carCategory;
     }
 
-    public String getTripId() {
-        return tripId;
-    }
+    public String getTripId() { return tripId; }
+    public void setTripId(String tripId) { this.tripId = tripId; }
 
-    public void setTripId(String tripId) {
-        this.tripId = tripId;
-    }
+    public String getDriverId() { return driverId; }
+    public void setDriverId(String driverId) { this.driverId = driverId; }
 
-    public String getDriverId() {
-        return driverId;
-    }
+    public String getDriverName() { return driverName; }
+    public void setDriverName(String driverName) { this.driverName = driverName; }
 
-    public void setDriverId(String driverId) {
-        this.driverId = driverId;
-    }
+    public String getLicensePlate() { return licensePlate; }
+    public void setLicensePlate(String licensePlate) { this.licensePlate = licensePlate; }
 
-    public String getDriverName() {
-        return driverName;
-    }
+    public String getFromLocation() { return fromLocation; }
+    public void setFromLocation(String fromLocation) { this.fromLocation = fromLocation; }
 
-    public void setDriverName(String driverName) {
-        this.driverName = driverName;
-    }
+    public String getToLocation() { return toLocation; }
+    public void setToLocation(String toLocation) { this.toLocation = toLocation; }
 
-    public String getLicensePlate() {
-        return licensePlate;
-    }
+    public long getDateTime() { return dateTime; }
+    public void setDateTime(long dateTime) { this.dateTime = dateTime; }
 
-    public void setLicensePlate(String licensePlate) {
-        this.licensePlate = licensePlate;
-    }
+    public double getPricePerSeat() { return pricePerSeat; }
+    public void setPricePerSeat(double pricePerSeat) { this.pricePerSeat = pricePerSeat; }
 
-    public String getFromLocation() {
-        return fromLocation;
-    }
+    public int getTotalSeats() { return totalSeats; }
+    public void setTotalSeats(int totalSeats) { this.totalSeats = totalSeats; }
 
-    public void setFromLocation(String fromLocation) {
-        this.fromLocation = fromLocation;
-    }
+    public int getSeatsAvailable() { return seatsAvailable; }
+    public void setSeatsAvailable(int seatsAvailable) { this.seatsAvailable = seatsAvailable; }
 
-    public String getToLocation() {
-        return toLocation;
-    }
+    public String getCarCategory() { return carCategory; }
+    public void setCarCategory(String carCategory) { this.carCategory = carCategory; }
 
-    public void setToLocation(String toLocation) {
-        this.toLocation = toLocation;
-    }
+    public List<String> getPassengerIds() { return passengerIds; }
+    public void setPassengerIds(List<String> passengerIds) { this.passengerIds = passengerIds; }
 
-    public long getDateTime() {
-        return dateTime;
-    }
+    public double getStartLat() { return startLat; }
+    public void setStartLat(double startLat) { this.startLat = startLat; }
 
-    public void setDateTime(long dateTime) {
-        this.dateTime = dateTime;
-    }
+    public double getStartLng() { return startLng; }
+    public void setStartLng(double startLng) { this.startLng = startLng; }
 
-    public double getPricePerSeat() {
-        return pricePerSeat;
-    }
+    public double getEndLat() { return endLat; }
+    public void setEndLat(double endLat) { this.endLat = endLat; }
 
-    public void setPricePerSeat(double pricePerSeat) {
-        this.pricePerSeat = pricePerSeat;
-    }
+    public double getEndLng() { return endLng; }
+    public void setEndLng(double endLng) { this.endLng = endLng; }
 
-    public int getTotalSeats() {
-        return totalSeats;
-    }
+    public String getEncodedPolyline() { return encodedPolyline; }
+    public void setEncodedPolyline(String encodedPolyline) { this.encodedPolyline = encodedPolyline; }
 
-    public void setTotalSeats(int totalSeats) {
-        this.totalSeats = totalSeats;
-    }
-
-    public int getSeatsAvailable() {
-        return seatsAvailable;
-    }
-
-    public void setSeatsAvailable(int seatsAvailable) {
-        this.seatsAvailable = seatsAvailable;
-    }
-
-    public String getCarCategory() {
-        return carCategory;
-    }
-
-    public void setCarCategory(String carCategory) {
-        this.carCategory = carCategory;
-    }
-
-    public List<String> getPassengerIds() {
-        return passengerIds;
-    }
-
-    public void setPassengerIds(List<String> passengerIds) {
-        this.passengerIds = passengerIds;
+    public boolean hasMapRoute() {
+        return startLat != 0 && startLng != 0 && endLat != 0 && endLng != 0;
     }
 }

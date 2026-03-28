@@ -2,6 +2,7 @@ package com.example.myway;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -29,16 +31,30 @@ import java.util.Locale;
 
 public class AddTripActivity extends MenuActivity {
 
-    private Spinner spinnerFrom, spinnerTo;
-    private EditText etDate, etTime, etPrice, etSeats;
+    private Spinner spinnerFrom;
+    private Spinner spinnerTo;
+    private EditText etDate;
+    private EditText etTime;
+    private EditText etPrice;
+    private EditText etSeats;
     private Button btnPublish;
     private ImageButton btnMore;
+    private TextView tvRouteStatus;
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private Calendar calendar;
 
-    private String driverName, licensePlate, carCategory;
+    private String driverName;
+    private String licensePlate;
+    private String carCategory;
+
+    private double startLat;
+    private double startLng;
+    private double endLat;
+    private double endLng;
+    private String encodedPolyline = "";
+    private boolean routeSelected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,31 +74,38 @@ public class AddTripActivity extends MenuActivity {
         etSeats = findViewById(R.id.etSeats);
         btnPublish = findViewById(R.id.btnPublish);
         btnMore = findViewById(R.id.btnMore);
+        tvRouteStatus = findViewById(R.id.tvRouteStatus);
 
         setupSpinners();
         fetchDriverDetails();
         setupMoreButton(btnMore);
 
-        etDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDatePicker();
-            }
+        etDate.setOnClickListener(v -> showDatePicker());
+        etTime.setOnClickListener(v -> showTimePicker());
+
+        findViewById(R.id.btnSelectRouteOnMap).setOnClickListener(v -> {
+            Intent intent = new Intent(AddTripActivity.this, RouteSelectionActivity.class);
+            startActivityForResult(intent, RouteSelectionActivity.REQUEST_CODE);
         });
 
-        etTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showTimePicker();
-            }
-        });
+        btnPublish.setOnClickListener(v -> publishTrip());
+    }
 
-        btnPublish.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                publishTrip();
-            }
-        });
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RouteSelectionActivity.REQUEST_CODE
+                && resultCode == RESULT_OK && data != null) {
+            startLat = data.getDoubleExtra("startLat", 0);
+            startLng = data.getDoubleExtra("startLng", 0);
+            endLat = data.getDoubleExtra("endLat", 0);
+            endLng = data.getDoubleExtra("endLng", 0);
+            encodedPolyline = data.getStringExtra("encodedPolyline");
+            if (encodedPolyline == null) encodedPolyline = "";
+            routeSelected = true;
+            tvRouteStatus.setText("Route drawn on map");
+            tvRouteStatus.setVisibility(View.VISIBLE);
+        }
     }
 
     private void setupSpinners() {
@@ -95,17 +118,16 @@ public class AddTripActivity extends MenuActivity {
 
     private void fetchDriverDetails() {
         if (mAuth.getCurrentUser() == null) return;
-
         String uid = mAuth.getCurrentUser().getUid();
         db.collection("users").document(uid).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
-                            DocumentSnapshot document = task.getResult();
-                            driverName = document.getString("name");
-                            licensePlate = document.getString("licensePlate");
-                            carCategory = document.getString("carCategory");
+                            DocumentSnapshot doc = task.getResult();
+                            driverName = doc.getString("name");
+                            licensePlate = doc.getString("licensePlate");
+                            carCategory = doc.getString("carCategory");
                         }
                     }
                 });
@@ -118,9 +140,11 @@ public class AddTripActivity extends MenuActivity {
                 calendar.set(Calendar.YEAR, year);
                 calendar.set(Calendar.MONTH, month);
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                updateDateLabel();
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+                etDate.setText(sdf.format(calendar.getTime()));
             }
-        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)).show();
     }
 
     private void showTimePicker() {
@@ -129,55 +153,58 @@ public class AddTripActivity extends MenuActivity {
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                 calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                 calendar.set(Calendar.MINUTE, minute);
-                updateTimeLabel();
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.US);
+                etTime.setText(sdf.format(calendar.getTime()));
             }
         }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
-    }
-
-    private void updateDateLabel() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
-        etDate.setText(sdf.format(calendar.getTime()));
-    }
-
-    private void updateTimeLabel() {
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.US);
-        etTime.setText(sdf.format(calendar.getTime()));
     }
 
     private void publishTrip() {
         String from = spinnerFrom.getSelectedItem().toString();
         String to = spinnerTo.getSelectedItem().toString();
-        String priceStr = etPrice.getText().toString();
-        String seatsStr = etSeats.getText().toString();
+        String priceStr = etPrice.getText().toString().trim();
+        String seatsStr = etSeats.getText().toString().trim();
 
-        if (TextUtils.isEmpty(priceStr) || TextUtils.isEmpty(seatsStr) || TextUtils.isEmpty(etDate.getText())) {
+        if (TextUtils.isEmpty(priceStr) || TextUtils.isEmpty(seatsStr)
+                || TextUtils.isEmpty(etDate.getText())) {
             Toast.makeText(this, "Please fill all details", Toast.LENGTH_SHORT).show();
             return;
         }
-
         if (from.equals(to)) {
-            Toast.makeText(this, "Destination cannot be the same as Start", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Destination cannot be the same as start", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!routeSelected) {
+            Toast.makeText(this, "Please draw your route on the map so passengers can find you",
+                    Toast.LENGTH_LONG).show();
             return;
         }
 
         double price = Double.parseDouble(priceStr);
         int seats = Integer.parseInt(seatsStr);
-        long tripTime = calendar.getTimeInMillis();
-
         String tripId = db.collection("trips").document().getId();
         String driverId = mAuth.getCurrentUser().getUid();
 
-        Trip newTrip = new Trip(tripId, driverId, driverName, licensePlate, from, to, tripTime, price, seats, carCategory);
+        Trip newTrip = new Trip(tripId, driverId, driverName, licensePlate,
+                from, to, calendar.getTimeInMillis(), price, seats, carCategory);
+        newTrip.setStartLat(startLat);
+        newTrip.setStartLng(startLng);
+        newTrip.setEndLat(endLat);
+        newTrip.setEndLng(endLng);
+        newTrip.setEncodedPolyline(encodedPolyline);
 
         db.collection("trips").document(tripId).set(newTrip)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(AddTripActivity.this, "Trip Published Successfully!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(AddTripActivity.this,
+                                    "Ride published successfully!", Toast.LENGTH_LONG).show();
                             finish();
                         } else {
-                            Toast.makeText(AddTripActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AddTripActivity.this,
+                                    "Error: " + task.getException().getMessage(),
+                                    Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
