@@ -62,10 +62,17 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="4dp"/>
 
-            <Spinner
-                android:id="@+id/spinnerSearchFrom"
+            <EditText
+                android:id="@+id/etSearchFrom"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
+                android:background="@null"
+                android:hint="e.g. Yerevan, Komitas"
+                android:textColorHint="@color/colorHintStrong"
+                android:textColor="@color/colorPrimaryText"
+                android:textSize="14sp"
+                android:maxLines="1"
+                android:inputType="textCapWords"
                 android:layout_marginBottom="12dp"/>
 
             <View
@@ -84,10 +91,17 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="4dp"/>
 
-            <Spinner
-                android:id="@+id/spinnerSearchTo"
+            <EditText
+                android:id="@+id/etSearchTo"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"/>
+                android:layout_height="48dp"
+                android:background="@null"
+                android:hint="e.g. Masis, Artashat"
+                android:textColorHint="@color/colorHintStrong"
+                android:textColor="@color/colorPrimaryText"
+                android:textSize="14sp"
+                android:maxLines="1"
+                android:inputType="textCapWords"/>
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
@@ -138,7 +152,7 @@
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
             android:text="Post Request"
-            android:textSize="13sp"
+            android:textSize="11sp"
             android:textStyle="bold"
             android:textAllCaps="false"
             app:cornerRadius="8dp"
@@ -153,7 +167,7 @@
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:layout_weight="1"
-            android:text="My Requests"
+            android:text="All Routes"
             android:textSize="13sp"
             android:textStyle="bold"
             android:textAllCaps="false"

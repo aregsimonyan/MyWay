@@ -3,10 +3,9 @@ package com.example.myway;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -32,8 +31,8 @@ import java.util.List;
 
 public class PassengerHomeActivity extends MenuActivity {
 
-    private Spinner spinnerFrom;
-    private Spinner spinnerTo;
+    private EditText etSearchFrom;
+    private EditText etSearchTo;
     private Button btnSearch;
     private Button btnMap;
     private Button btnPostRequest;
@@ -41,7 +40,9 @@ public class PassengerHomeActivity extends MenuActivity {
     private ImageButton btnMore;
     private RecyclerView recyclerView;
     private TripAdapter adapter;
+
     private List<Trip> tripList;
+    private List<Trip> allTripList;
 
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
@@ -55,7 +56,6 @@ public class PassengerHomeActivity extends MenuActivity {
         initializeFirebase();
         initializeViews();
         setupRecyclerView();
-        setupSpinners();
         setupClickListeners();
         setupMoreButton(btnMore);
         loadAllTrips();
@@ -67,8 +67,8 @@ public class PassengerHomeActivity extends MenuActivity {
     }
 
     private void initializeViews() {
-        spinnerFrom = findViewById(R.id.spinnerSearchFrom);
-        spinnerTo = findViewById(R.id.spinnerSearchTo);
+        etSearchFrom = findViewById(R.id.etSearchFrom);
+        etSearchTo = findViewById(R.id.etSearchTo);
         btnSearch = findViewById(R.id.btnSearch);
         btnMap = findViewById(R.id.btnOpenMap);
         btnPostRequest = findViewById(R.id.btnPostRequest);
@@ -76,6 +76,7 @@ public class PassengerHomeActivity extends MenuActivity {
         btnMore = findViewById(R.id.btnMore);
         recyclerView = findViewById(R.id.recyclerViewTrips);
         tripList = new ArrayList<>();
+        allTripList = new ArrayList<>();
     }
 
     private void setupRecyclerView() {
@@ -87,14 +88,6 @@ public class PassengerHomeActivity extends MenuActivity {
             }
         });
         recyclerView.setAdapter(adapter);
-    }
-
-    private void setupSpinners() {
-        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
-                R.array.cities_array, android.R.layout.simple_spinner_item);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerFrom.setAdapter(spinnerAdapter);
-        spinnerTo.setAdapter(spinnerAdapter);
     }
 
     private void setupClickListeners() {
@@ -136,13 +129,15 @@ public class PassengerHomeActivity extends MenuActivity {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            tripList.clear();
+                            allTripList.clear();
                             for (DocumentSnapshot doc : task.getResult()) {
                                 Trip trip = doc.toObject(Trip.class);
                                 if (trip != null && trip.getSeatsAvailable() > 0) {
-                                    tripList.add(trip);
+                                    allTripList.add(trip);
                                 }
                             }
+                            tripList.clear();
+                            tripList.addAll(allTripList);
                             adapter.notifyDataSetChanged();
                         }
                     }
@@ -150,33 +145,24 @@ public class PassengerHomeActivity extends MenuActivity {
     }
 
     private void searchTrips() {
-        String from = spinnerFrom.getSelectedItem().toString();
-        String to = spinnerTo.getSelectedItem().toString();
+        String from = etSearchFrom.getText().toString().trim().toLowerCase();
+        String to = etSearchTo.getText().toString().trim().toLowerCase();
 
-        db.collection("trips")
-                .whereEqualTo("fromLocation", from)
-                .whereEqualTo("toLocation", to)
-                .whereGreaterThan("dateTime", System.currentTimeMillis())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            tripList.clear();
-                            for (DocumentSnapshot doc : task.getResult()) {
-                                Trip trip = doc.toObject(Trip.class);
-                                if (trip != null && trip.getSeatsAvailable() > 0) {
-                                    tripList.add(trip);
-                                }
-                            }
-                            adapter.notifyDataSetChanged();
-                            if (tripList.isEmpty()) {
-                                Toast.makeText(PassengerHomeActivity.this,
-                                        "No trips found.", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    }
-                });
+        tripList.clear();
+        for (Trip trip : allTripList) {
+            boolean fromMatch = from.isEmpty()
+                    || trip.getFromLocation().toLowerCase().contains(from);
+            boolean toMatch = to.isEmpty()
+                    || trip.getToLocation().toLowerCase().contains(to);
+            if (fromMatch && toMatch) {
+                tripList.add(trip);
+            }
+        }
+        adapter.notifyDataSetChanged();
+
+        if (tripList.isEmpty()) {
+            Toast.makeText(this, "No trips found for this route.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void confirmBooking(Trip trip) {

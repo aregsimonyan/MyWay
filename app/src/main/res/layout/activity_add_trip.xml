@@ -106,10 +106,15 @@
                                 android:textSize="10sp"
                                 android:textStyle="bold"/>
 
-                            <Spinner
-                                android:id="@+id/spinnerFrom"
+                            <TextView
+                                android:id="@+id/tvFromLocation"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"/>
+                                android:layout_height="wrap_content"
+                                android:text="Draw route on map to set"
+                                android:textColor="@color/colorHintStrong"
+                                android:textSize="15sp"
+                                android:maxLines="2"
+                                android:ellipsize="end"/>
 
                         </LinearLayout>
                     </LinearLayout>
@@ -149,10 +154,15 @@
                                 android:textSize="10sp"
                                 android:textStyle="bold"/>
 
-                            <Spinner
-                                android:id="@+id/spinnerTo"
+                            <TextView
+                                android:id="@+id/tvToLocation"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"/>
+                                android:layout_height="wrap_content"
+                                android:text="Draw route on map to set"
+                                android:textColor="@color/colorHintStrong"
+                                android:textSize="15sp"
+                                android:maxLines="2"
+                                android:ellipsize="end"/>
 
                         </LinearLayout>
                     </LinearLayout>
@@ -177,7 +187,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Show passengers your exact route on the live map."
+                        android:text="Tap the button below to draw your exact route on the map. Your start and end location names will be set automatically."
                         android:textColor="@color/colorSecondaryText"
                         android:textSize="13sp"
                         android:layout_marginBottom="12dp"/>

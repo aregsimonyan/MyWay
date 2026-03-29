@@ -105,10 +105,15 @@
                                 android:textSize="10sp"
                                 android:textStyle="bold"/>
 
-                            <Spinner
-                                android:id="@+id/spinnerReqFrom"
+                            <TextView
+                                android:id="@+id/tvReqFromLocation"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"/>
+                                android:layout_height="wrap_content"
+                                android:text="Draw route on map to set"
+                                android:textColor="@color/colorHintStrong"
+                                android:textSize="15sp"
+                                android:maxLines="2"
+                                android:ellipsize="end"/>
 
                         </LinearLayout>
                     </LinearLayout>
@@ -148,10 +153,15 @@
                                 android:textSize="10sp"
                                 android:textStyle="bold"/>
 
-                            <Spinner
-                                android:id="@+id/spinnerReqTo"
+                            <TextView
+                                android:id="@+id/tvReqToLocation"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"/>
+                                android:layout_height="wrap_content"
+                                android:text="Draw route on map to set"
+                                android:textColor="@color/colorHintStrong"
+                                android:textSize="15sp"
+                                android:maxLines="2"
+                                android:ellipsize="end"/>
 
                         </LinearLayout>
                     </LinearLayout>

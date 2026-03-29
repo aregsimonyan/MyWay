@@ -6,12 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -31,8 +29,8 @@ import java.util.Locale;
 
 public class AddTripActivity extends MenuActivity {
 
-    private Spinner spinnerFrom;
-    private Spinner spinnerTo;
+    private TextView tvFromLocation;
+    private TextView tvToLocation;
     private EditText etDate;
     private EditText etTime;
     private EditText etPrice;
@@ -49,6 +47,8 @@ public class AddTripActivity extends MenuActivity {
     private String licensePlate;
     private String carCategory;
 
+    private String fromLocationName = "";
+    private String toLocationName = "";
     private double startLat;
     private double startLng;
     private double endLat;
@@ -66,8 +66,8 @@ public class AddTripActivity extends MenuActivity {
         db = FirebaseFirestore.getInstance();
         calendar = Calendar.getInstance();
 
-        spinnerFrom = findViewById(R.id.spinnerFrom);
-        spinnerTo = findViewById(R.id.spinnerTo);
+        tvFromLocation = findViewById(R.id.tvFromLocation);
+        tvToLocation = findViewById(R.id.tvToLocation);
         etDate = findViewById(R.id.etDate);
         etTime = findViewById(R.id.etTime);
         etPrice = findViewById(R.id.etPrice);
@@ -76,7 +76,6 @@ public class AddTripActivity extends MenuActivity {
         btnMore = findViewById(R.id.btnMore);
         tvRouteStatus = findViewById(R.id.tvRouteStatus);
 
-        setupSpinners();
         fetchDriverDetails();
         setupMoreButton(btnMore);
 
@@ -101,19 +100,23 @@ public class AddTripActivity extends MenuActivity {
             endLat = data.getDoubleExtra("endLat", 0);
             endLng = data.getDoubleExtra("endLng", 0);
             encodedPolyline = data.getStringExtra("encodedPolyline");
+            fromLocationName = data.getStringExtra("startName");
+            toLocationName = data.getStringExtra("endName");
+
             if (encodedPolyline == null) encodedPolyline = "";
+            if (fromLocationName == null) fromLocationName = "";
+            if (toLocationName == null) toLocationName = "";
+
             routeSelected = true;
+
+            tvFromLocation.setText(fromLocationName);
+            tvFromLocation.setTextColor(getResources().getColor(R.color.colorPrimaryText));
+            tvToLocation.setText(toLocationName);
+            tvToLocation.setTextColor(getResources().getColor(R.color.colorPrimaryText));
+
             tvRouteStatus.setText("Route drawn on map");
             tvRouteStatus.setVisibility(View.VISIBLE);
         }
-    }
-
-    private void setupSpinners() {
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.cities_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerFrom.setAdapter(adapter);
-        spinnerTo.setAdapter(adapter);
     }
 
     private void fetchDriverDetails() {
@@ -160,8 +163,6 @@ public class AddTripActivity extends MenuActivity {
     }
 
     private void publishTrip() {
-        String from = spinnerFrom.getSelectedItem().toString();
-        String to = spinnerTo.getSelectedItem().toString();
         String priceStr = etPrice.getText().toString().trim();
         String seatsStr = etSeats.getText().toString().trim();
 
@@ -170,13 +171,13 @@ public class AddTripActivity extends MenuActivity {
             Toast.makeText(this, "Please fill all details", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (from.equals(to)) {
-            Toast.makeText(this, "Destination cannot be the same as start", Toast.LENGTH_SHORT).show();
-            return;
-        }
         if (!routeSelected) {
             Toast.makeText(this, "Please draw your route on the map so passengers can find you",
                     Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (fromLocationName.equals(toLocationName)) {
+            Toast.makeText(this, "Start and destination cannot be the same", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -186,7 +187,7 @@ public class AddTripActivity extends MenuActivity {
         String driverId = mAuth.getCurrentUser().getUid();
 
         Trip newTrip = new Trip(tripId, driverId, driverName, licensePlate,
-                from, to, calendar.getTimeInMillis(), price, seats, carCategory);
+                fromLocationName, toLocationName, calendar.getTimeInMillis(), price, seats, carCategory);
         newTrip.setStartLat(startLat);
         newTrip.setStartLng(startLng);
         newTrip.setEndLat(endLat);

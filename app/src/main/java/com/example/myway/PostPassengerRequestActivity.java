@@ -6,12 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -33,8 +31,8 @@ import java.util.Locale;
 
 public class PostPassengerRequestActivity extends MenuActivity {
 
-    private Spinner spinnerReqFrom;
-    private Spinner spinnerReqTo;
+    private TextView tvReqFromLocation;
+    private TextView tvReqToLocation;
     private EditText etReqDate;
     private EditText etReqTime;
     private EditText etReqMaxPrice;
@@ -48,6 +46,8 @@ public class PostPassengerRequestActivity extends MenuActivity {
 
     private String passengerName;
     private String passengerPhone;
+    private String fromLocationName = "";
+    private String toLocationName = "";
     private double startLat;
     private double startLng;
     private double endLat;
@@ -65,8 +65,8 @@ public class PostPassengerRequestActivity extends MenuActivity {
         db = FirebaseFirestore.getInstance();
         calendar = Calendar.getInstance();
 
-        spinnerReqFrom = findViewById(R.id.spinnerReqFrom);
-        spinnerReqTo = findViewById(R.id.spinnerReqTo);
+        tvReqFromLocation = findViewById(R.id.tvReqFromLocation);
+        tvReqToLocation = findViewById(R.id.tvReqToLocation);
         etReqDate = findViewById(R.id.etReqDate);
         etReqTime = findViewById(R.id.etReqTime);
         etReqMaxPrice = findViewById(R.id.etReqMaxPrice);
@@ -74,7 +74,6 @@ public class PostPassengerRequestActivity extends MenuActivity {
         progressPublish = findViewById(R.id.progressPublish);
         btnMore = findViewById(R.id.btnMore);
 
-        setupSpinners();
         fetchPassengerProfile();
         setupMoreButton(btnMore);
 
@@ -88,14 +87,6 @@ public class PostPassengerRequestActivity extends MenuActivity {
         });
 
         findViewById(R.id.btnPublishRequest).setOnClickListener(v -> checkDuplicateThenPublish());
-    }
-
-    private void setupSpinners() {
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.cities_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerReqFrom.setAdapter(adapter);
-        spinnerReqTo.setAdapter(adapter);
     }
 
     private void fetchPassengerProfile() {
@@ -123,8 +114,20 @@ public class PostPassengerRequestActivity extends MenuActivity {
             endLat = data.getDoubleExtra("endLat", 0);
             endLng = data.getDoubleExtra("endLng", 0);
             encodedPolyline = data.getStringExtra("encodedPolyline");
+            fromLocationName = data.getStringExtra("startName");
+            toLocationName = data.getStringExtra("endName");
+
             if (encodedPolyline == null) encodedPolyline = "";
+            if (fromLocationName == null) fromLocationName = "";
+            if (toLocationName == null) toLocationName = "";
+
             routeSelected = true;
+
+            tvReqFromLocation.setText(fromLocationName);
+            tvReqFromLocation.setTextColor(getResources().getColor(R.color.colorPrimaryText));
+            tvReqToLocation.setText(toLocationName);
+            tvReqToLocation.setTextColor(getResources().getColor(R.color.colorPrimaryText));
+
             tvReqRouteStatus.setText("Route drawn on map");
             tvReqRouteStatus.setVisibility(View.VISIBLE);
         }
@@ -157,8 +160,6 @@ public class PostPassengerRequestActivity extends MenuActivity {
     }
 
     private void checkDuplicateThenPublish() {
-        String from = spinnerReqFrom.getSelectedItem().toString();
-        String to = spinnerReqTo.getSelectedItem().toString();
         String priceStr = etReqMaxPrice.getText().toString().trim();
 
         if (TextUtils.isEmpty(etReqDate.getText())) {
@@ -169,12 +170,12 @@ public class PostPassengerRequestActivity extends MenuActivity {
             Toast.makeText(this, "Please enter your maximum price", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (from.equals(to)) {
-            Toast.makeText(this, "Start and destination cannot be the same", Toast.LENGTH_SHORT).show();
-            return;
-        }
         if (!routeSelected) {
             Toast.makeText(this, "Please draw your route on the map", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (fromLocationName.equals(toLocationName)) {
+            Toast.makeText(this, "Start and destination cannot be the same", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -204,7 +205,8 @@ public class PostPassengerRequestActivity extends MenuActivity {
                                     .setNegativeButton("Cancel", null)
                                     .show();
                         } else {
-                            publishRequest(from, to, Double.parseDouble(priceStr), uid);
+                            publishRequest(fromLocationName, toLocationName,
+                                    Double.parseDouble(priceStr), uid);
                         }
                     }
                 });

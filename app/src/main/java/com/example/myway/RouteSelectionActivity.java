@@ -1,6 +1,8 @@
 package com.example.myway;
 
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -28,10 +30,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
+import java.util.Locale;
 
 public class RouteSelectionActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -45,10 +49,20 @@ public class RouteSelectionActivity extends AppCompatActivity implements OnMapRe
     private Polyline routeLine;
     private LatLng startPoint;
     private LatLng endPoint;
+
     private TextView tvInstruction;
+    private TextView tvStartName;
+    private TextView tvEndName;
     private ProgressBar progressBar;
+
     private boolean pickingStart = true;
     private String lastEncodedPolyline = "";
+    private String startName = "";
+    private String endName = "";
+
+    private interface NameCallback {
+        void onName(String name);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +70,8 @@ public class RouteSelectionActivity extends AppCompatActivity implements OnMapRe
         setContentView(R.layout.activity_route_selection);
 
         tvInstruction = findViewById(R.id.tvInstruction);
+        tvStartName = findViewById(R.id.tvStartName);
+        tvEndName = findViewById(R.id.tvEndName);
         progressBar = findViewById(R.id.progressBar);
 
         SupportMapFragment mapFragment = (SupportMapFragment)
@@ -84,8 +100,15 @@ public class RouteSelectionActivity extends AppCompatActivity implements OnMapRe
                     .position(point)
                     .title("Start")
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-            pickingStart = false;
-            tvInstruction.setText("Now tap to set the END point");
+            tvInstruction.setText("Detecting location...");
+            reverseGeocode(point, name -> {
+                startName = name;
+                tvStartName.setText("From: " + name);
+                tvStartName.setVisibility(View.VISIBLE);
+                if (startMarker != null) startMarker.setTitle(name);
+                pickingStart = false;
+                tvInstruction.setText("Now tap to set the END point");
+            });
         } else {
             endPoint = point;
             if (endMarker != null) endMarker.remove();
@@ -93,9 +116,49 @@ public class RouteSelectionActivity extends AppCompatActivity implements OnMapRe
                     .position(point)
                     .title("End")
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-            tvInstruction.setText("Fetching road route...");
-            fetchDirectionsRoute();
+            tvInstruction.setText("Detecting location...");
+            reverseGeocode(point, name -> {
+                endName = name;
+                tvEndName.setText("To: " + name);
+                tvEndName.setVisibility(View.VISIBLE);
+                if (endMarker != null) endMarker.setTitle(name);
+                tvInstruction.setText("Fetching road route...");
+                fetchDirectionsRoute();
+            });
         }
+    }
+
+    private void reverseGeocode(LatLng point, NameCallback callback) {
+        new Thread(() -> {
+            final String[] detectedName = {formatCoordinate(point)};
+            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+            try {
+                List<Address> addresses = geocoder.getFromLocation(point.latitude, point.longitude, 1);
+                if (addresses != null && !addresses.isEmpty()) {
+                    Address address = addresses.get(0);
+                    String subLocality = address.getSubLocality();
+                    String locality = address.getLocality();
+                    String thoroughfare = address.getThoroughfare();
+
+                    if (thoroughfare != null && locality != null) {
+                        detectedName[0] = thoroughfare + ", " + locality;
+                    } else if (subLocality != null && locality != null) {
+                        detectedName[0] = subLocality + ", " + locality;
+                    } else if (locality != null) {
+                        detectedName[0] = locality;
+                    } else if (address.getAddressLine(0) != null) {
+                        detectedName[0] = address.getAddressLine(0);
+                    }
+                }
+            } catch (IOException e) {
+                Log.e(TAG, "Geocoder error: " + e.getMessage());
+            }
+            runOnUiThread(() -> callback.onName(detectedName[0]));
+        }).start();
+    }
+
+    private String formatCoordinate(LatLng point) {
+        return String.format(Locale.US, "%.4f, %.4f", point.latitude, point.longitude);
     }
 
     private void fetchDirectionsRoute() {
@@ -106,8 +169,6 @@ public class RouteSelectionActivity extends AppCompatActivity implements OnMapRe
                 + "?origin=" + startPoint.latitude + "," + startPoint.longitude
                 + "&destination=" + endPoint.latitude + "," + endPoint.longitude
                 + "&key=" + MAPS_API_KEY;
-
-        Log.d(TAG, "Directions request URL: " + urlStr);
 
         new Thread(() -> {
             String encodedPolyline = null;
@@ -120,9 +181,6 @@ public class RouteSelectionActivity extends AppCompatActivity implements OnMapRe
                 conn.setConnectTimeout(10000);
                 conn.setReadTimeout(10000);
 
-                int responseCode = conn.getResponseCode();
-                Log.d(TAG, "HTTP response code: " + responseCode);
-
                 BufferedReader reader = new BufferedReader(
                         new InputStreamReader(conn.getInputStream()));
                 StringBuilder sb = new StringBuilder();
@@ -133,12 +191,8 @@ public class RouteSelectionActivity extends AppCompatActivity implements OnMapRe
                 reader.close();
                 conn.disconnect();
 
-                String rawResponse = sb.toString();
-                Log.d(TAG, "Directions API raw response: " + rawResponse);
-
-                JSONObject response = new JSONObject(rawResponse);
+                JSONObject response = new JSONObject(sb.toString());
                 String status = response.getString("status");
-                Log.d(TAG, "Directions API status: " + status);
 
                 if ("OK".equals(status)) {
                     JSONArray routes = response.getJSONArray("routes");
@@ -146,23 +200,16 @@ public class RouteSelectionActivity extends AppCompatActivity implements OnMapRe
                         JSONObject polylineObj = routes.getJSONObject(0)
                                 .getJSONObject("overview_polyline");
                         encodedPolyline = polylineObj.getString("points");
-                        Log.d(TAG, "Polyline decoded successfully, length: " + encodedPolyline.length());
                     } else {
                         errorReason = "No routes returned by API";
-                        Log.w(TAG, errorReason);
                     }
                 } else {
-                    if (response.has("error_message")) {
-                        errorReason = status + ": " + response.getString("error_message");
-                    } else {
-                        errorReason = "API status: " + status;
-                    }
-                    Log.e(TAG, "Directions API error: " + errorReason);
+                    errorReason = response.has("error_message")
+                            ? status + ": " + response.getString("error_message")
+                            : "API status: " + status;
                 }
-
             } catch (Exception e) {
                 errorReason = e.getClass().getSimpleName() + ": " + e.getMessage();
-                Log.e(TAG, "Exception calling Directions API: " + errorReason, e);
             }
 
             final String finalEncoded = encodedPolyline;
@@ -170,21 +217,19 @@ public class RouteSelectionActivity extends AppCompatActivity implements OnMapRe
 
             runOnUiThread(() -> {
                 progressBar.setVisibility(View.GONE);
-
                 if (finalEncoded != null && !finalEncoded.isEmpty()) {
                     lastEncodedPolyline = finalEncoded;
                     drawDecodedRoute(PolylineUtils.decode(finalEncoded));
-                    tvInstruction.setText("Road route found. Confirm or Reset to change.");
+                    tvInstruction.setText("Route found. Confirm or Reset to change.");
                 } else {
                     lastEncodedPolyline = "";
                     drawStraightLine();
                     tvInstruction.setText("Straight line shown. Confirm or Reset.");
-                    Log.w(TAG, "Falling back to straight line. Reason: " + finalError);
                     Toast.makeText(RouteSelectionActivity.this,
-                            "Road route unavailable (" + finalError + "). Showing straight line.",
-                            Toast.LENGTH_LONG).show();
+                            "Road route unavailable. Showing straight line.",
+                            Toast.LENGTH_SHORT).show();
+                    Log.w(TAG, "Falling back to straight line. Reason: " + finalError);
                 }
-
                 fitCameraToBothPoints();
                 findViewById(R.id.btnConfirmRoute).setEnabled(true);
             });
@@ -223,9 +268,13 @@ public class RouteSelectionActivity extends AppCompatActivity implements OnMapRe
         if (routeLine != null) { routeLine.remove(); routeLine = null; }
         startPoint = null;
         endPoint = null;
+        startName = "";
+        endName = "";
         lastEncodedPolyline = "";
         pickingStart = true;
         tvInstruction.setText("Tap the map to set the START point");
+        tvStartName.setVisibility(View.GONE);
+        tvEndName.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
         findViewById(R.id.btnConfirmRoute).setEnabled(false);
     }
@@ -241,6 +290,8 @@ public class RouteSelectionActivity extends AppCompatActivity implements OnMapRe
         result.putExtra("endLat", endPoint.latitude);
         result.putExtra("endLng", endPoint.longitude);
         result.putExtra("encodedPolyline", lastEncodedPolyline);
+        result.putExtra("startName", startName);
+        result.putExtra("endName", endName);
         setResult(RESULT_OK, result);
         finish();
     }
