@@ -2,6 +2,7 @@ package com.example.myway;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -32,13 +33,20 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Transaction;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -62,6 +70,7 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
     private com.google.android.material.floatingactionbutton.FloatingActionButton fabMyLocation;
     private MaterialButton btnToggleTrips;
     private MaterialButton btnToggleRequests;
+    private MaterialCardView layerToggleCard;
 
     private CardView cardRouteInfo;
     private TextView tvRouteTypeBadge;
@@ -70,14 +79,21 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
     private TextView tvInfoPrice;
     private TextView tvInfoSeats;
     private TextView tvInfoDriver;
+    private TextView tvInfoCarModel;
+    private TextView tvInfoCarCategory;
+    private TextView tvInfoLicensePlate;
     private TextView tvInfoReqDateTime;
     private TextView tvInfoMaxPrice;
     private TextView tvInfoPassenger;
     private LinearLayout layoutDriverInfo;
     private LinearLayout layoutPassengerInfo;
     private ImageButton btnCloseInfo;
+    private MaterialButton btnBookFromMap;
+    private MaterialButton btnShowAllRoutes;
 
     private FirebaseFirestore db;
+    private FirebaseAuth mAuth;
+
     private final Map<String, Trip> tripMap = new HashMap<>();
     private final Map<String, PassengerRequest> requestMap = new HashMap<>();
     private final List<Trip> allTrips = new ArrayList<>();
@@ -86,6 +102,9 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
     private boolean tripsVisible = true;
     private boolean requestsVisible = true;
 
+    private String focusedTripId = null;
+    private String isolatedTripId = null;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +112,10 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        db = FirebaseFirestore.getInstance();
+        db    = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+
+        focusedTripId = getIntent().getStringExtra("tripId");
 
         etSearchAddress     = findViewById(R.id.etSearchAddress);
         btnSearchIcon       = findViewById(R.id.btnSearchIcon);
@@ -101,6 +123,7 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
         fabMyLocation       = findViewById(R.id.fabMyLocation);
         btnToggleTrips      = findViewById(R.id.btnToggleTrips);
         btnToggleRequests   = findViewById(R.id.btnToggleRequests);
+        layerToggleCard     = findViewById(R.id.layerToggleCard);
         cardRouteInfo       = findViewById(R.id.cardRouteInfo);
         tvRouteTypeBadge    = findViewById(R.id.tvRouteTypeBadge);
         tvInfoRoute         = findViewById(R.id.tvInfoRoute);
@@ -108,14 +131,27 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
         tvInfoPrice         = findViewById(R.id.tvInfoPrice);
         tvInfoSeats         = findViewById(R.id.tvInfoSeats);
         tvInfoDriver        = findViewById(R.id.tvInfoDriver);
+        tvInfoCarModel      = findViewById(R.id.tvInfoCarModel);
+        tvInfoCarCategory   = findViewById(R.id.tvInfoCarCategory);
+        tvInfoLicensePlate  = findViewById(R.id.tvInfoLicensePlate);
         tvInfoReqDateTime   = findViewById(R.id.tvInfoReqDateTime);
         tvInfoMaxPrice      = findViewById(R.id.tvInfoMaxPrice);
         tvInfoPassenger     = findViewById(R.id.tvInfoPassenger);
         layoutDriverInfo    = findViewById(R.id.layoutDriverInfo);
         layoutPassengerInfo = findViewById(R.id.layoutPassengerInfo);
         btnCloseInfo        = findViewById(R.id.btnCloseInfo);
+        btnBookFromMap      = findViewById(R.id.btnBookFromMap);
+        btnShowAllRoutes    = findViewById(R.id.btnShowAllRoutes);
 
-        btnCloseInfo.setOnClickListener(v -> cardRouteInfo.setVisibility(View.GONE));
+        btnCloseInfo.setOnClickListener(v -> {
+            if (isolatedTripId != null) {
+                exitIsolationMode();
+            } else {
+                cardRouteInfo.setVisibility(View.GONE);
+            }
+        });
+
+        btnShowAllRoutes.setOnClickListener(v -> exitIsolationMode());
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -123,9 +159,24 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
                 getSupportFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) mapFragment.getMapAsync(this);
 
-        initSearchWidgets();
+        if (focusedTripId != null) {
+            layerToggleCard.setVisibility(View.GONE);
+            etSearchAddress.setHint("Single trip view");
+            etSearchAddress.setEnabled(false);
+        } else {
+            initSearchWidgets();
+            setupToggleButtons();
+        }
+
         setupMoreButton(btnMore);
-        setupToggleButtons();
+    }
+
+    private void exitIsolationMode() {
+        isolatedTripId = null;
+        btnShowAllRoutes.setVisibility(View.GONE);
+        btnBookFromMap.setVisibility(View.GONE);
+        cardRouteInfo.setVisibility(View.GONE);
+        redrawRoutes();
     }
 
     private void setupToggleButtons() {
@@ -205,14 +256,29 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
             myMap.getUiSettings().setMyLocationButtonEnabled(false);
         }
 
-        myMap.setOnMapClickListener(latLng -> cardRouteInfo.setVisibility(View.GONE));
+        myMap.setOnMapClickListener(latLng -> {
+            if (isolatedTripId != null) {
+                exitIsolationMode();
+            } else {
+                cardRouteInfo.setVisibility(View.GONE);
+            }
+        });
 
         myMap.setOnPolylineClickListener(polyline -> {
             String tag = (String) polyline.getTag();
             if (tag == null) return;
+
             if (tag.startsWith("trip:")) {
-                Trip trip = tripMap.get(tag.substring(5));
-                if (trip != null) showDriverRouteInfo(trip);
+                String id = tag.substring(5);
+                Trip trip = tripMap.get(id);
+                if (trip == null) return;
+
+                if (focusedTripId != null) {
+                    showDriverRouteInfo(trip, false);
+                } else {
+                    isolateTripOnMap(trip);
+                }
+
             } else if (tag.startsWith("req:")) {
                 PassengerRequest req = requestMap.get(tag.substring(4));
                 if (req != null) showPassengerRouteInfo(req);
@@ -220,7 +286,52 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
         });
 
         getLastLocation();
-        loadRoutesOnMap();
+
+        if (focusedTripId != null) {
+            loadSingleTrip(focusedTripId);
+        } else {
+            loadRoutesOnMap();
+        }
+    }
+
+    private void isolateTripOnMap(Trip trip) {
+        isolatedTripId = trip.getTripId();
+
+        myMap.clear();
+        drawTrip(trip, 0);
+
+        LatLngBounds.Builder builder = new LatLngBounds.Builder()
+                .include(new LatLng(trip.getStartLat(), trip.getStartLng()))
+                .include(new LatLng(trip.getEndLat(), trip.getEndLng()));
+        myMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 140));
+
+        showDriverRouteInfo(trip, true);
+    }
+
+    private void loadSingleTrip(String tripId) {
+        db.collection("trips").document(tripId).get()
+                .addOnSuccessListener(doc -> {
+                    if (doc == null || !doc.exists()) return;
+                    Trip trip = doc.toObject(Trip.class);
+                    if (trip == null) return;
+                    allTrips.clear();
+                    tripMap.clear();
+                    allTrips.add(trip);
+                    tripMap.put(trip.getTripId(), trip);
+                    tripsVisible    = true;
+                    requestsVisible = false;
+                    redrawRoutes();
+                    if (trip.hasMapRoute()) {
+                        LatLngBounds bounds = new LatLngBounds.Builder()
+                                .include(new LatLng(trip.getStartLat(), trip.getStartLng()))
+                                .include(new LatLng(trip.getEndLat(), trip.getEndLng()))
+                                .build();
+                        myMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 140));
+                    }
+                    showDriverRouteInfo(trip, false);
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Could not load trip.", Toast.LENGTH_SHORT).show());
     }
 
     private void loadRoutesOnMap() {
@@ -240,7 +351,6 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
                             tripMap.put(trip.getTripId(), trip);
                         }
                     }
-
                     db.collection("requests")
                             .whereGreaterThan("dateTime", System.currentTimeMillis())
                             .get()
@@ -272,7 +382,6 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
                 groups.computeIfAbsent(key, k -> new ArrayList<>()).add(trip);
             }
         }
-
         if (requestsVisible) {
             for (PassengerRequest req : allRequests) {
                 String key = routeBucket(
@@ -306,15 +415,10 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
             raw.add(new LatLng(trip.getStartLat(), trip.getStartLng()));
             raw.add(new LatLng(trip.getEndLat(),   trip.getEndLng()));
         }
-
         List<LatLng> points = applyLaneOffset(raw, offsetMeters);
 
         Polyline polyline = myMap.addPolyline(new PolylineOptions()
-                .width(14f)
-                .color(0xFFFFAA00)
-                .geodesic(false)
-                .clickable(true)
-                .addAll(points));
+                .width(14f).color(0xFFFFAA00).geodesic(false).clickable(true).addAll(points));
         polyline.setTag("trip:" + trip.getTripId());
 
         myMap.addMarker(new MarkerOptions()
@@ -322,7 +426,6 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
                 .title(trip.getFromLocation())
                 .snippet(trip.getDriverName())
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
-
         myMap.addMarker(new MarkerOptions()
                 .position(points.get(points.size() - 1))
                 .title(trip.getToLocation())
@@ -339,15 +442,10 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
             raw.add(new LatLng(req.getStartLat(), req.getStartLng()));
             raw.add(new LatLng(req.getEndLat(),   req.getEndLng()));
         }
-
         List<LatLng> points = applyLaneOffset(raw, offsetMeters);
 
         Polyline polyline = myMap.addPolyline(new PolylineOptions()
-                .width(14f)
-                .color(0xFF4CAF50)
-                .geodesic(false)
-                .clickable(true)
-                .addAll(points));
+                .width(14f).color(0xFF4CAF50).geodesic(false).clickable(true).addAll(points));
         polyline.setTag("req:" + req.getRequestId());
 
         myMap.addMarker(new MarkerOptions()
@@ -355,11 +453,141 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
                 .title(req.getFromLocation())
                 .snippet(req.getPassengerName())
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-
         myMap.addMarker(new MarkerOptions()
                 .position(points.get(points.size() - 1))
                 .title(req.getToLocation())
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
+    }
+
+    private void showDriverRouteInfo(Trip trip, boolean showActions) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy  HH:mm", Locale.US);
+
+        tvRouteTypeBadge.setText("DRIVER ROUTE");
+        tvRouteTypeBadge.setBackgroundColor(0xFFFFAA00);
+        tvInfoRoute.setText(trip.getFromLocation() + "  →  " + trip.getToLocation());
+        tvInfoDateTime.setText(sdf.format(trip.getDateTime()));
+        tvInfoPrice.setText((int) trip.getPricePerSeat() + " AMD");
+        tvInfoSeats.setText(trip.getSeatsAvailable() + " seat(s) left");
+        tvInfoDriver.setText(trip.getDriverName());
+        tvInfoCarModel.setText(
+                trip.getCarModel() != null && !trip.getCarModel().isEmpty()
+                        ? trip.getCarModel() : "—");
+        tvInfoCarCategory.setText(trip.getCarCategory() != null ? trip.getCarCategory() : "—");
+        tvInfoLicensePlate.setText(trip.getLicensePlate() != null ? trip.getLicensePlate() : "—");
+
+        if (showActions) {
+            String currentUserId = mAuth.getCurrentUser() != null
+                    ? mAuth.getCurrentUser().getUid() : "";
+            boolean alreadyBooked = trip.getPassengerIds() != null
+                    && trip.getPassengerIds().contains(currentUserId);
+
+            btnShowAllRoutes.setVisibility(View.VISIBLE);
+
+            if (alreadyBooked) {
+                btnBookFromMap.setVisibility(View.VISIBLE);
+                btnBookFromMap.setText("✓ Booked");
+                btnBookFromMap.setBackgroundTintList(
+                        android.content.res.ColorStateList.valueOf(0xFF2E7D32));
+                btnBookFromMap.setTextColor(0xFFFFFFFF);
+                btnBookFromMap.setEnabled(false);
+            } else if (trip.getSeatsAvailable() <= 0) {
+                btnBookFromMap.setVisibility(View.VISIBLE);
+                btnBookFromMap.setText("Full");
+                btnBookFromMap.setBackgroundTintList(
+                        android.content.res.ColorStateList.valueOf(0xFF888888));
+                btnBookFromMap.setTextColor(0xFFFFFFFF);
+                btnBookFromMap.setEnabled(false);
+            } else {
+                btnBookFromMap.setVisibility(View.VISIBLE);
+                btnBookFromMap.setText("Book This Trip");
+                btnBookFromMap.setBackgroundTintList(
+                        android.content.res.ColorStateList.valueOf(0xFFEEEEEE));
+                btnBookFromMap.setTextColor(0xFF111111);
+                btnBookFromMap.setEnabled(true);
+                btnBookFromMap.setOnClickListener(v -> confirmAndBook(trip));
+            }
+        } else {
+            btnShowAllRoutes.setVisibility(View.GONE);
+            btnBookFromMap.setVisibility(View.GONE);
+        }
+
+        layoutDriverInfo.setVisibility(View.VISIBLE);
+        layoutPassengerInfo.setVisibility(View.GONE);
+        cardRouteInfo.setVisibility(View.VISIBLE);
+    }
+
+    private void showPassengerRouteInfo(PassengerRequest req) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy  HH:mm", Locale.US);
+
+        tvRouteTypeBadge.setText("PASSENGER REQUEST");
+        tvRouteTypeBadge.setBackgroundColor(0xFF388E3C);
+        tvInfoRoute.setText(req.getFromLocation() + "  →  " + req.getToLocation());
+        tvInfoReqDateTime.setText(sdf.format(req.getDateTime()));
+        tvInfoMaxPrice.setText("Up to " + (int) req.getMaxPrice() + " AMD");
+        tvInfoPassenger.setText(req.getPassengerName() + "  ·  " + req.getPassengerPhone());
+
+        btnShowAllRoutes.setVisibility(View.GONE);
+        btnBookFromMap.setVisibility(View.GONE);
+
+        layoutDriverInfo.setVisibility(View.GONE);
+        layoutPassengerInfo.setVisibility(View.VISIBLE);
+        cardRouteInfo.setVisibility(View.VISIBLE);
+    }
+
+    private void confirmAndBook(Trip trip) {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Confirm Booking")
+                .setMessage("Book a seat from " + trip.getFromLocation()
+                        + " to " + trip.getToLocation()
+                        + " for " + (int) trip.getPricePerSeat() + " AMD?")
+                .setPositiveButton("Book Now", (dialog, which) -> executeBooking(trip))
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void executeBooking(Trip trip) {
+        if (mAuth.getCurrentUser() == null) {
+            Toast.makeText(this, "Please log in to book.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        btnBookFromMap.setEnabled(false);
+        btnBookFromMap.setText("Booking...");
+
+        final DocumentReference tripRef =
+                db.collection("trips").document(trip.getTripId());
+        final String passengerId = mAuth.getCurrentUser().getUid();
+
+        db.runTransaction(new Transaction.Function<Void>() {
+            @Override
+            public Void apply(@NonNull Transaction transaction)
+                    throws FirebaseFirestoreException {
+                DocumentSnapshot snapshot = transaction.get(tripRef);
+                long newSeats = snapshot.getLong("seatsAvailable") - 1;
+                if (newSeats < 0) {
+                    throw new FirebaseFirestoreException("Trip is full",
+                            FirebaseFirestoreException.Code.ABORTED);
+                }
+                transaction.update(tripRef, "seatsAvailable", newSeats);
+                transaction.update(tripRef, "passengerIds",
+                        FieldValue.arrayUnion(passengerId));
+                return null;
+            }
+        }).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Intent intent = new Intent(MapActivity.this, BookedTripActivity.class);
+                intent.putExtra("tripId", trip.getTripId());
+                startActivity(intent);
+                exitIsolationMode();
+                loadRoutesOnMap();
+            } else {
+                btnBookFromMap.setEnabled(true);
+                btnBookFromMap.setText("Book This Trip");
+                Toast.makeText(MapActivity.this,
+                        "Booking failed: " + task.getException().getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private List<LatLng> applyLaneOffset(List<LatLng> points, double meters) {
@@ -367,8 +595,8 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
         List<LatLng> result = new ArrayList<>(points.size());
         for (int i = 0; i < points.size(); i++) {
             LatLng cur  = points.get(i);
-            LatLng from = (i > 0)                   ? points.get(i - 1) : points.get(i + 1);
-            LatLng to   = (i < points.size() - 1)   ? points.get(i + 1) : points.get(i - 1);
+            LatLng from = (i > 0)                 ? points.get(i - 1) : points.get(i + 1);
+            LatLng to   = (i < points.size() - 1) ? points.get(i + 1) : points.get(i - 1);
             double bear = bearing(from, to);
             result.add(offsetPoint(cur, (bear + 90.0) % 360.0, meters));
         }
@@ -391,9 +619,8 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
         double lat1 = Math.toRadians(point.latitude);
         double lon1 = Math.toRadians(point.longitude);
         double b    = Math.toRadians(bearingDeg);
-        double lat2 = Math.asin(
-                Math.sin(lat1) * Math.cos(d)
-                        + Math.cos(lat1) * Math.sin(d) * Math.cos(b));
+        double lat2 = Math.asin(Math.sin(lat1) * Math.cos(d)
+                + Math.cos(lat1) * Math.sin(d) * Math.cos(b));
         double lon2 = lon1 + Math.atan2(
                 Math.sin(b) * Math.sin(d) * Math.cos(lat1),
                 Math.cos(d) - Math.sin(lat1) * Math.sin(lat2));
@@ -407,38 +634,11 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
         return (a.compareTo(b) <= 0) ? a + "|" + b : b + "|" + a;
     }
 
-    private void showDriverRouteInfo(Trip trip) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy  HH:mm", Locale.US);
-        tvRouteTypeBadge.setText("DRIVER ROUTE");
-        tvRouteTypeBadge.setBackgroundColor(0xFFFFAA00);
-        tvInfoRoute.setText(trip.getFromLocation() + "  →  " + trip.getToLocation());
-        tvInfoDateTime.setText(sdf.format(trip.getDateTime()));
-        tvInfoPrice.setText((int) trip.getPricePerSeat() + " AMD");
-        tvInfoSeats.setText(trip.getSeatsAvailable() + " seat(s) left");
-        tvInfoDriver.setText(trip.getDriverName() + "  ·  "
-                + trip.getCarCategory() + "  ·  " + trip.getLicensePlate());
-        layoutDriverInfo.setVisibility(View.VISIBLE);
-        layoutPassengerInfo.setVisibility(View.GONE);
-        cardRouteInfo.setVisibility(View.VISIBLE);
-    }
-
-    private void showPassengerRouteInfo(PassengerRequest req) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy  HH:mm", Locale.US);
-        tvRouteTypeBadge.setText("PASSENGER REQUEST");
-        tvRouteTypeBadge.setBackgroundColor(0xFF388E3C);
-        tvInfoRoute.setText(req.getFromLocation() + "  →  " + req.getToLocation());
-        tvInfoReqDateTime.setText(sdf.format(req.getDateTime()));
-        tvInfoMaxPrice.setText("Up to " + (int) req.getMaxPrice() + " AMD");
-        tvInfoPassenger.setText(req.getPassengerName() + "  ·  " + req.getPassengerPhone());
-        layoutDriverInfo.setVisibility(View.GONE);
-        layoutPassengerInfo.setVisibility(View.VISIBLE);
-        cardRouteInfo.setVisibility(View.VISIBLE);
-    }
-
     private void getLastLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
@@ -447,16 +647,17 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
         }
         Task<Location> task = fusedLocationProviderClient.getLastLocation();
         task.addOnSuccessListener(location -> {
-            if (location != null) {
-                LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+            if (location != null && focusedTripId == null && isolatedTripId == null) {
+                LatLng currentLatLng = new LatLng(
+                        location.getLatitude(), location.getLongitude());
                 myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 13));
             }
         });
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == FINE_PERMISSION_CODE) {
             if (grantResults.length > 0
@@ -469,7 +670,8 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
                 }
                 getLastLocation();
             } else {
-                Toast.makeText(this, "Location permission is denied.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Location permission is denied.",
+                        Toast.LENGTH_SHORT).show();
             }
         }
     }

@@ -3,9 +3,10 @@ package com.example.myway;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,7 @@ import com.example.myway.adapters.TripAdapter;
 import com.example.myway.models.Trip;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -33,13 +35,16 @@ public class PassengerHomeActivity extends MenuActivity {
 
     private EditText etSearchFrom;
     private EditText etSearchTo;
-    private Button btnSearch;
-    private Button btnMap;
-    private Button btnPostRequest;
-    private Button btnMyRequests;
+    private MaterialButton btnSearch;
+    private MaterialButton btnOpenMap;
+    private MaterialButton btnPostRequest;
+    private MaterialButton btnMyBookings;
     private ImageButton btnMore;
     private RecyclerView recyclerView;
     private TripAdapter adapter;
+    private TextView tvTripCount;
+    private TextView tvEmptyTrips;
+    private ProgressBar progressTrips;
 
     private List<Trip> tripList;
     private List<Trip> allTripList;
@@ -53,81 +58,83 @@ public class PassengerHomeActivity extends MenuActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_passenger_home);
 
-        initializeFirebase();
-        initializeViews();
-        setupRecyclerView();
-        setupClickListeners();
-        setupMoreButton(btnMore);
-        loadAllTrips();
-    }
-
-    private void initializeFirebase() {
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
-    }
 
-    private void initializeViews() {
         etSearchFrom = findViewById(R.id.etSearchFrom);
         etSearchTo = findViewById(R.id.etSearchTo);
         btnSearch = findViewById(R.id.btnSearch);
-        btnMap = findViewById(R.id.btnOpenMap);
+        btnOpenMap = findViewById(R.id.btnOpenMap);
         btnPostRequest = findViewById(R.id.btnPostRequest);
-        btnMyRequests = findViewById(R.id.btnMyRequests);
+        btnMyBookings = findViewById(R.id.btnMyBookings);
         btnMore = findViewById(R.id.btnMore);
         recyclerView = findViewById(R.id.recyclerViewTrips);
+        tvTripCount = findViewById(R.id.tvTripCount);
+        tvEmptyTrips = findViewById(R.id.tvEmptyTrips);
+        progressTrips = findViewById(R.id.progressTrips);
+
         tripList = new ArrayList<>();
         allTripList = new ArrayList<>();
-    }
 
-    private void setupRecyclerView() {
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new TripAdapter(tripList, new TripAdapter.OnTripClickListener() {
+        String currentUserId = mAuth.getCurrentUser() != null
+                ? mAuth.getCurrentUser().getUid() : "";
+
+        adapter = new TripAdapter(tripList, currentUserId, new TripAdapter.OnTripActionListener() {
+            @Override
+            public void onCardClick(Trip trip) {
+                openTripOnMap(trip);
+            }
+
             @Override
             public void onBookClick(Trip trip) {
                 confirmBooking(trip);
             }
         });
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
+        recyclerView.setNestedScrollingEnabled(false);
+
+        btnSearch.setOnClickListener(v -> searchTrips());
+
+        btnOpenMap.setOnClickListener(v ->
+                startActivity(new Intent(this, MapActivity.class)));
+
+        btnPostRequest.setOnClickListener(v ->
+                startActivity(new Intent(this, PostPassengerRequestActivity.class)));
+
+        btnMyBookings.setOnClickListener(v ->
+                startActivity(new Intent(this, MyBookingsActivity.class)));
+
+        setupMoreButton(btnMore);
+        loadAllTrips();
     }
 
-    private void setupClickListeners() {
-        btnSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                searchTrips();
-            }
-        });
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadAllTrips();
+    }
 
-        btnMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(PassengerHomeActivity.this, MapActivity.class));
-            }
-        });
-
-        btnPostRequest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(PassengerHomeActivity.this,
-                        PostPassengerRequestActivity.class));
-            }
-        });
-
-        btnMyRequests.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(PassengerHomeActivity.this, MyRequestsActivity.class));
-            }
-        });
+    private void openTripOnMap(Trip trip) {
+        Intent intent = new Intent(this, MapActivity.class);
+        intent.putExtra("tripId", trip.getTripId());
+        startActivity(intent);
     }
 
     private void loadAllTrips() {
+        progressTrips.setVisibility(View.VISIBLE);
+        tvEmptyTrips.setVisibility(View.GONE);
+        tvTripCount.setText("Loading trips...");
+
         db.collection("trips")
                 .whereGreaterThan("dateTime", System.currentTimeMillis())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        progressTrips.setVisibility(View.GONE);
+
                         if (task.isSuccessful()) {
                             allTripList.clear();
                             for (DocumentSnapshot doc : task.getResult()) {
@@ -139,6 +146,16 @@ public class PassengerHomeActivity extends MenuActivity {
                             tripList.clear();
                             tripList.addAll(allTripList);
                             adapter.notifyDataSetChanged();
+
+                            int count = allTripList.size();
+                            tvTripCount.setText(count + " ride" + (count == 1 ? "" : "s") + " available");
+
+                            if (tripList.isEmpty()) {
+                                tvEmptyTrips.setText("No trips available right now.");
+                                tvEmptyTrips.setVisibility(View.VISIBLE);
+                            }
+                        } else {
+                            tvTripCount.setText("Could not load trips");
                         }
                     }
                 });
@@ -161,49 +178,58 @@ public class PassengerHomeActivity extends MenuActivity {
         adapter.notifyDataSetChanged();
 
         if (tripList.isEmpty()) {
-            Toast.makeText(this, "No trips found for this route.", Toast.LENGTH_SHORT).show();
+            tvEmptyTrips.setText("No trips found for this route.\nTry different keywords.");
+            tvEmptyTrips.setVisibility(View.VISIBLE);
+        } else {
+            tvEmptyTrips.setVisibility(View.GONE);
         }
+
+        tvTripCount.setText(tripList.size() + " result" + (tripList.size() == 1 ? "" : "s") + " found");
     }
 
     private void confirmBooking(Trip trip) {
         new AlertDialog.Builder(this)
                 .setTitle("Confirm Booking")
-                .setMessage("Book a seat to " + trip.getToLocation()
+                .setMessage("Book a seat from " + trip.getFromLocation()
+                        + " to " + trip.getToLocation()
                         + " for " + (int) trip.getPricePerSeat() + " AMD?")
-                .setPositiveButton("Yes", (dialog, which) -> executeBooking(trip))
-                .setNegativeButton("No", null)
+                .setPositiveButton("Book Now", (dialog, which) -> executeBooking(trip))
+                .setNegativeButton("Cancel", null)
                 .show();
     }
 
     private void executeBooking(Trip trip) {
-        final DocumentReference tripRef = db.collection("trips").document(trip.getTripId());
+        final DocumentReference tripRef =
+                db.collection("trips").document(trip.getTripId());
         final String passengerId = mAuth.getCurrentUser().getUid();
 
         db.runTransaction(new Transaction.Function<Void>() {
             @Override
-            public Void apply(@NonNull Transaction transaction) throws FirebaseFirestoreException {
+            public Void apply(@NonNull Transaction transaction)
+                    throws FirebaseFirestoreException {
                 DocumentSnapshot snapshot = transaction.get(tripRef);
                 long newSeats = snapshot.getLong("seatsAvailable") - 1;
-
                 if (newSeats < 0) {
                     throw new FirebaseFirestoreException("Trip is full",
                             FirebaseFirestoreException.Code.ABORTED);
                 }
-
                 transaction.update(tripRef, "seatsAvailable", newSeats);
-                transaction.update(tripRef, "passengerIds", FieldValue.arrayUnion(passengerId));
+                transaction.update(tripRef, "passengerIds",
+                        FieldValue.arrayUnion(passengerId));
                 return null;
             }
         }).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Toast.makeText(PassengerHomeActivity.this,
-                            "Booking Confirmed!", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(PassengerHomeActivity.this,
+                            BookedTripActivity.class);
+                    intent.putExtra("tripId", trip.getTripId());
+                    startActivity(intent);
                     loadAllTrips();
                 } else {
                     Toast.makeText(PassengerHomeActivity.this,
-                            "Booking Failed: " + task.getException().getMessage(),
+                            "Booking failed: " + task.getException().getMessage(),
                             Toast.LENGTH_SHORT).show();
                 }
             }

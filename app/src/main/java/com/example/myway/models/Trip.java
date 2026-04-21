@@ -7,13 +7,14 @@ public class Trip {
     private String driverId;
     private String driverName;
     private String licensePlate;
+    private String carModel;
+    private String carCategory;
     private String fromLocation;
     private String toLocation;
     private long dateTime;
     private double pricePerSeat;
     private int totalSeats;
     private int seatsAvailable;
-    private String carCategory;
     private List<String> passengerIds;
     private double startLat;
     private double startLng;
@@ -52,6 +53,12 @@ public class Trip {
     public String getLicensePlate() { return licensePlate; }
     public void setLicensePlate(String licensePlate) { this.licensePlate = licensePlate; }
 
+    public String getCarModel() { return carModel; }
+    public void setCarModel(String carModel) { this.carModel = carModel; }
+
+    public String getCarCategory() { return carCategory; }
+    public void setCarCategory(String carCategory) { this.carCategory = carCategory; }
+
     public String getFromLocation() { return fromLocation; }
     public void setFromLocation(String fromLocation) { this.fromLocation = fromLocation; }
 
@@ -69,9 +76,6 @@ public class Trip {
 
     public int getSeatsAvailable() { return seatsAvailable; }
     public void setSeatsAvailable(int seatsAvailable) { this.seatsAvailable = seatsAvailable; }
-
-    public String getCarCategory() { return carCategory; }
-    public void setCarCategory(String carCategory) { this.carCategory = carCategory; }
 
     public List<String> getPassengerIds() { return passengerIds; }
     public void setPassengerIds(List<String> passengerIds) { this.passengerIds = passengerIds; }

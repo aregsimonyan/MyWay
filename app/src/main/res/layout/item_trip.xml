@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardTrip"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    android:elevation="4dp"
-    android:backgroundTint="@color/colorCard">
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="6dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardBackgroundColor="@color/colorCard"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:strokeColor="@color/colorCardBorder"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,68 +24,100 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="10dp">
 
             <TextView
                 android:id="@+id/tvRoute"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Yerevan -> Masis"
-                android:textSize="18sp"
+                android:textSize="17sp"
                 android:textStyle="bold"
-                android:textColor="@color/colorPrimaryText"/>
+                android:textColor="@color/colorPrimaryText"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:layout_marginEnd="8dp"/>
 
             <TextView
-                android:id="@+id/tvPrice"
+                android:id="@+id/tvCategory"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="500 AMD"
-                android:textSize="18sp"
+                android:textSize="10sp"
                 android:textStyle="bold"
-                android:textColor="@color/colorPriceText"/>
+                android:textColor="#FFFFFF"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"/>
+
         </LinearLayout>
 
         <TextView
             android:id="@+id/tvDateTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Date &amp; Time"
+            android:textSize="13sp"
             android:textColor="@color/colorSecondaryText"
-            android:layout_marginTop="5dp"/>
+            android:layout_marginBottom="4dp"/>
 
         <TextView
             android:id="@+id/tvDriverInfo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Driver Name • Car Model"
-            android:textStyle="italic"
+            android:textSize="13sp"
             android:textColor="@color/colorSecondaryText"
-            android:layout_marginTop="5dp"/>
+            android:layout_marginBottom="14dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorDivider"
+            android:layout_marginBottom="12dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="10dp"
             android:gravity="center_vertical">
 
-            <TextView
-                android:id="@+id/tvSeats"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="3 seats left"
-                android:textColor="@color/colorSeatsText"/>
+                android:orientation="vertical">
 
-            <Button
+                <TextView
+                    android:id="@+id/tvPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorPriceText"/>
+
+                <TextView
+                    android:id="@+id/tvSeats"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="@color/colorSeatsText"
+                    android:layout_marginTop="2dp"/>
+
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnBook"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="BOOK"
+                android:layout_height="40dp"
+                android:paddingHorizontal="20dp"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textAllCaps="false"
+                app:cornerRadius="8dp"
                 android:backgroundTint="@color/colorButton"
                 android:textColor="@color/colorButtonText"/>
+
         </LinearLayout>
 
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+
+</com.google.android.material.card.MaterialCardView>
