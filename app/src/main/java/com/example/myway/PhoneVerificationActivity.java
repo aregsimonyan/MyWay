@@ -20,6 +20,7 @@ import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class PhoneVerificationActivity extends AppCompatActivity {
@@ -37,7 +38,8 @@ public class PhoneVerificationActivity extends AppCompatActivity {
     private boolean canResend = false;
 
     private String mode, phone, name, email, password;
-    private String userType, carModel, licensePlate, carCategory;
+    private String userType, carModel, licensePlate, carCategory, activeRole;
+    private ArrayList<String> roles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +84,13 @@ public class PhoneVerificationActivity extends AppCompatActivity {
         carModel     = b.getString("carModel", "");
         licensePlate = b.getString("licensePlate", "");
         carCategory  = b.getString("carCategory", "Economy");
+        activeRole   = b.getString("activeRole", userType);
+        roles        = b.getStringArrayList("roles");
+
+        if (roles == null || roles.isEmpty()) {
+            roles = new ArrayList<>();
+            if (userType != null) roles.add(userType);
+        }
     }
 
     private String toInternationalFormat(String rawPhone) {
@@ -193,9 +202,9 @@ public class PhoneVerificationActivity extends AppCompatActivity {
     }
 
     private void saveToFirestore(String uid) {
-        User newUser = new User(uid, name, email, phone, userType);
+        User newUser = new User(uid, name, email, phone, activeRole, roles);
 
-        if ("Driver".equals(userType)) {
+        if (roles.contains("Driver")) {
             newUser.setCarModel(carModel);
             newUser.setLicensePlate(licensePlate);
             newUser.setCarCategory(carCategory);
@@ -204,7 +213,7 @@ public class PhoneVerificationActivity extends AppCompatActivity {
         db.collection("users").document(uid).set(newUser)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Intent intent = "Driver".equals(userType)
+                        Intent intent = "Driver".equals(activeRole)
                                 ? new Intent(PhoneVerificationActivity.this, DriverHomeActivity.class)
                                 : new Intent(PhoneVerificationActivity.this, PassengerHomeActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |

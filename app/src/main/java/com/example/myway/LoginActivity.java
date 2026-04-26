@@ -163,7 +163,7 @@ public class LoginActivity extends AppCompatActivity {
                                     googleSignInClient.signOut();
                                     return;
                                 }
-                                routeUserByType(doc.getString("userType"));
+                                routeByActiveRole(doc);
                             } else {
                                 openCompleteProfile(firebaseUser, account);
                             }
@@ -198,7 +198,7 @@ public class LoginActivity extends AppCompatActivity {
                                 return;
                             }
 
-                            routeUserByType(doc.getString("userType"));
+                            routeByActiveRole(doc);
                         } else {
                             Toast.makeText(LoginActivity.this, "Account not found. Please register.", Toast.LENGTH_LONG).show();
                             mAuth.signOut();
@@ -207,9 +207,14 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    private void routeUserByType(String userType) {
+    private void routeByActiveRole(DocumentSnapshot doc) {
+        String activeRole = doc.getString("activeRole");
+        if (activeRole == null) {
+            activeRole = doc.getString("userType");
+        }
+
         Intent intent;
-        if ("Driver".equals(userType)) {
+        if ("Driver".equals(activeRole)) {
             intent = new Intent(LoginActivity.this, DriverHomeActivity.class);
         } else {
             intent = new Intent(LoginActivity.this, PassengerHomeActivity.class);

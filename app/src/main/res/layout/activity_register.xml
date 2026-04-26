@@ -121,7 +121,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="24dp">
+            android:layout_marginBottom="16dp">
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/rbPassenger"
@@ -145,7 +145,16 @@
                 android:textSize="16sp"/>
         </RadioGroup>
 
-        <!-- Driver-only fields, hidden by default -->
+        <CheckBox
+            android:id="@+id/cbAlsoBoth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Also register as a Driver"
+            android:textColor="@color/colorSecondaryText"
+            android:buttonTint="@color/colorPrimaryText"
+            android:textSize="14sp"
+            android:layout_marginBottom="24dp"/>
+
         <LinearLayout
             android:id="@+id/driverFieldsLayout"
             android:layout_width="match_parent"

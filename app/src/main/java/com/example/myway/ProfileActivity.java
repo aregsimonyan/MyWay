@@ -14,6 +14,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.List;
+
 public class ProfileActivity extends MenuActivity {
 
     private TextView tvName, tvEmail, tvPhone, tvType, tvCar;
@@ -51,19 +53,34 @@ public class ProfileActivity extends MenuActivity {
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
                             DocumentSnapshot doc = task.getResult();
+
                             tvName.setText("Name: " + doc.getString("name"));
                             tvEmail.setText("Email: " + doc.getString("email"));
                             tvPhone.setText("Phone: " + doc.getString("phone"));
 
-                            String type = doc.getString("userType");
-                            tvType.setText("Type: " + type);
+                            String activeRole = doc.getString("activeRole");
+                            if (activeRole == null) activeRole = doc.getString("userType");
 
-                            if ("Driver".equals(type)) {
+                            List<String> roles = (List<String>) doc.get("roles");
+                            boolean hasBothRoles = roles != null && roles.size() >= 2;
+
+                            if (hasBothRoles) {
+                                String secondaryRole = "Driver".equals(activeRole) ? "Passenger" : "Driver";
+                                tvType.setText("Type: " + activeRole + " (also " + secondaryRole + ")");
+                            } else {
+                                tvType.setText("Type: " + activeRole);
+                            }
+
+                            if ("Driver".equals(activeRole)) {
                                 tvCar.setVisibility(View.VISIBLE);
-                                tvCar.setText("Car: " + doc.getString("carModel") + " (" + doc.getString("licensePlate") + ")");
+                                tvCar.setText("Car: " + doc.getString("carModel")
+                                        + " (" + doc.getString("licensePlate") + ")");
+                            } else {
+                                tvCar.setVisibility(View.GONE);
                             }
                         } else {
-                            Toast.makeText(ProfileActivity.this, "Failed to load profile", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ProfileActivity.this,
+                                    "Failed to load profile", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

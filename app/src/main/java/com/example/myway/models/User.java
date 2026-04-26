@@ -1,11 +1,16 @@
 package com.example.myway.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class User {
     private String uid;
     private String name;
     private String email;
     private String phone;
     private String userType;
+    private String activeRole;
+    private List<String> roles;
     private String carModel;
     private String licensePlate;
     private String carCategory;
@@ -21,87 +26,59 @@ public class User {
         this.email = email;
         this.phone = phone;
         this.userType = userType;
+        this.activeRole = userType;
+        this.roles = new ArrayList<>();
+        this.roles.add(userType);
         this.warningCount = 0;
         this.isBanned = false;
     }
 
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
+    public User(String uid, String name, String email, String phone,
+                String activeRole, List<String> roles) {
         this.uid = uid;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
         this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
         this.phone = phone;
+        this.userType = activeRole;
+        this.activeRole = activeRole;
+        this.roles = roles;
+        this.warningCount = 0;
+        this.isBanned = false;
     }
 
-    public String getUserType() {
-        return userType;
-    }
+    public String getUid() { return uid; }
+    public void setUid(String uid) { this.uid = uid; }
 
-    public void setUserType(String userType) {
-        this.userType = userType;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getCarModel() {
-        return carModel;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public void setCarModel(String carModel) {
-        this.carModel = carModel;
-    }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 
-    public String getLicensePlate() {
-        return licensePlate;
-    }
+    public String getUserType() { return userType; }
+    public void setUserType(String userType) { this.userType = userType; }
 
-    public void setLicensePlate(String licensePlate) {
-        this.licensePlate = licensePlate;
-    }
+    public String getActiveRole() { return activeRole; }
+    public void setActiveRole(String activeRole) { this.activeRole = activeRole; }
 
-    public String getCarCategory() {
-        return carCategory;
-    }
+    public List<String> getRoles() { return roles; }
+    public void setRoles(List<String> roles) { this.roles = roles; }
 
-    public void setCarCategory(String carCategory) {
-        this.carCategory = carCategory;
-    }
+    public String getCarModel() { return carModel; }
+    public void setCarModel(String carModel) { this.carModel = carModel; }
 
-    public int getWarningCount() {
-        return warningCount;
-    }
+    public String getLicensePlate() { return licensePlate; }
+    public void setLicensePlate(String licensePlate) { this.licensePlate = licensePlate; }
 
-    public void setWarningCount(int warningCount) {
-        this.warningCount = warningCount;
-    }
+    public String getCarCategory() { return carCategory; }
+    public void setCarCategory(String carCategory) { this.carCategory = carCategory; }
 
-    public boolean isBanned() {
-        return isBanned;
-    }
+    public int getWarningCount() { return warningCount; }
+    public void setWarningCount(int warningCount) { this.warningCount = warningCount; }
 
-    public void setBanned(boolean banned) {
-        isBanned = banned;
-    }
+    public boolean isBanned() { return isBanned; }
+    public void setBanned(boolean banned) { isBanned = banned; }
 }
