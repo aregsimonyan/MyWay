@@ -132,6 +132,37 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSwitchMode"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="12dp"
+        android:text="Draw Custom Route"
+        android:textColor="#EEEEEE"
+        android:textAllCaps="false"
+        android:textSize="13sp"
+        android:backgroundTint="#1E88E5"
+        app:cornerRadius="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btnConfirmRoute"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnFinishCustom"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="12dp"
+        android:text="Finish"
+        android:textColor="#111111"
+        android:textAllCaps="false"
+        android:textSize="13sp"
+        android:backgroundTint="#4CAF50"
+        app:cornerRadius="12dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@id/btnResetRoute"
+        app:layout_constraintBottom_toTopOf="@id/btnConfirmRoute"/>
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnResetRoute"
         android:layout_width="wrap_content"
         android:layout_height="48dp"

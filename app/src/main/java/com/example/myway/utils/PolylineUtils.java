@@ -45,4 +45,30 @@ public class PolylineUtils {
 
         return result;
     }
+
+    public static String encode(List<LatLng> path) {
+        StringBuilder result = new StringBuilder();
+        int lastLat = 0;
+        int lastLng = 0;
+        for (LatLng point : path) {
+            int lat = (int) Math.round(point.latitude * 1e5);
+            int lng = (int) Math.round(point.longitude * 1e5);
+            result.append(encodeValue(lat - lastLat));
+            result.append(encodeValue(lng - lastLng));
+            lastLat = lat;
+            lastLng = lng;
+        }
+        return result.toString();
+    }
+
+    private static String encodeValue(int value) {
+        value = value < 0 ? ~(value << 1) : (value << 1);
+        StringBuilder chunk = new StringBuilder();
+        while (value >= 0x20) {
+            chunk.append((char) ((0x20 | (value & 0x1f)) + 63));
+            value >>= 5;
+        }
+        chunk.append((char) (value + 63));
+        return chunk.toString();
+    }
 }

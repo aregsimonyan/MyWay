@@ -59,7 +59,33 @@ import java.util.Map;
 public class MapActivity extends MenuActivity implements OnMapReadyCallback {
 
     private static final int FINE_PERMISSION_CODE = 1;
-    private static final double LANE_OFFSET_METERS = 6.0;
+    private static final double LANE_OFFSET_METERS = 22.0;
+
+    private static final int[] TRIP_COLORS = {
+            0xFFFFD600,
+            0xFFFF6D00,
+            0xFFE91E63,
+            0xFF00BCD4,
+            0xFF7C4DFF,
+            0xFF76FF03,
+            0xFFFF1744,
+            0xFF00E5FF,
+            0xFFFFAB00,
+            0xFF69F0AE
+    };
+
+    private static final int[] REQUEST_COLORS = {
+            0xFF00E676,
+            0xFF40C4FF,
+            0xFFEA80FC,
+            0xFFCCFF90,
+            0xFF80D8FF,
+            0xFFB9F6CA,
+            0xFFCE93D8,
+            0xFF80CBC4,
+            0xFFA5D6A7,
+            0xFF90CAF9
+    };
 
     private GoogleMap myMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -99,8 +125,7 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
     private final List<Trip> allTrips = new ArrayList<>();
     private final List<PassengerRequest> allRequests = new ArrayList<>();
 
-    private boolean tripsVisible = true;
-    private boolean requestsVisible = true;
+    private boolean showingTrips = true;
 
     private String focusedTripId = null;
     private String isolatedTripId = null;
@@ -180,29 +205,42 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
     }
 
     private void setupToggleButtons() {
-        applyToggleStyle(btnToggleTrips,    tripsVisible,    0xFFFFAA00);
-        applyToggleStyle(btnToggleRequests, requestsVisible, 0xFF4CAF50);
+        applyActiveStyle(btnToggleTrips,    0xFFFFD600);
+        applyInactiveStyle(btnToggleRequests);
 
         btnToggleTrips.setOnClickListener(v -> {
-            tripsVisible = !tripsVisible;
-            applyToggleStyle(btnToggleTrips, tripsVisible, 0xFFFFAA00);
+            if (showingTrips) return;
+            showingTrips = true;
+            applyActiveStyle(btnToggleTrips,    0xFFFFD600);
+            applyInactiveStyle(btnToggleRequests);
             redrawRoutes();
         });
 
         btnToggleRequests.setOnClickListener(v -> {
-            requestsVisible = !requestsVisible;
-            applyToggleStyle(btnToggleRequests, requestsVisible, 0xFF4CAF50);
+            if (!showingTrips) return;
+            showingTrips = false;
+            applyActiveStyle(btnToggleRequests, 0xFF00E676);
+            applyInactiveStyle(btnToggleTrips);
             redrawRoutes();
         });
     }
 
-    private void applyToggleStyle(MaterialButton btn, boolean active, int activeColor) {
+    private void applyActiveStyle(MaterialButton btn, int color) {
         btn.setBackgroundTintList(
-                android.content.res.ColorStateList.valueOf(active ? activeColor : 0xFF2A2A2A));
-        btn.setTextColor(active ? 0xFF111111 : 0xFF888888);
+                android.content.res.ColorStateList.valueOf(color));
+        btn.setTextColor(0xFF111111);
         btn.setStrokeColor(
-                android.content.res.ColorStateList.valueOf(active ? activeColor : 0xFF444444));
-        btn.setAlpha(active ? 1f : 0.65f);
+                android.content.res.ColorStateList.valueOf(color));
+        btn.setAlpha(1f);
+    }
+
+    private void applyInactiveStyle(MaterialButton btn) {
+        btn.setBackgroundTintList(
+                android.content.res.ColorStateList.valueOf(0xFF2A2A2A));
+        btn.setTextColor(0xFF888888);
+        btn.setStrokeColor(
+                android.content.res.ColorStateList.valueOf(0xFF444444));
+        btn.setAlpha(0.65f);
     }
 
     private void initSearchWidgets() {
@@ -298,7 +336,8 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
         isolatedTripId = trip.getTripId();
 
         myMap.clear();
-        drawTrip(trip, 0);
+        int color = colorForId(trip.getTripId(), TRIP_COLORS);
+        drawTripWithColor(trip, 0, color);
 
         LatLngBounds.Builder builder = new LatLngBounds.Builder()
                 .include(new LatLng(trip.getStartLat(), trip.getStartLng()))
@@ -318,8 +357,7 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
                     tripMap.clear();
                     allTrips.add(trip);
                     tripMap.put(trip.getTripId(), trip);
-                    tripsVisible    = true;
-                    requestsVisible = false;
+                    showingTrips = true;
                     redrawRoutes();
                     if (trip.hasMapRoute()) {
                         LatLngBounds bounds = new LatLngBounds.Builder()
@@ -372,40 +410,58 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
         myMap.clear();
         cardRouteInfo.setVisibility(View.GONE);
 
-        Map<String, List<Object>> groups = new HashMap<>();
-
-        if (tripsVisible) {
+        if (showingTrips) {
+            Map<String, List<Trip>> groups = new HashMap<>();
             for (Trip trip : allTrips) {
                 String key = routeBucket(
                         trip.getStartLat(), trip.getStartLng(),
                         trip.getEndLat(),   trip.getEndLng());
                 groups.computeIfAbsent(key, k -> new ArrayList<>()).add(trip);
             }
-        }
-        if (requestsVisible) {
+            for (List<Trip> group : groups.values()) {
+                int n = group.size();
+                for (int i = 0; i < n; i++) {
+                    double offset = (i - (n - 1) / 2.0) * LANE_OFFSET_METERS;
+                    Trip trip = group.get(i);
+                    int color = colorForId(trip.getTripId(), TRIP_COLORS);
+                    drawTripWithColor(trip, offset, color);
+                }
+            }
+        } else {
+            Map<String, List<PassengerRequest>> groups = new HashMap<>();
             for (PassengerRequest req : allRequests) {
                 String key = routeBucket(
                         req.getStartLat(), req.getStartLng(),
                         req.getEndLat(),   req.getEndLng());
                 groups.computeIfAbsent(key, k -> new ArrayList<>()).add(req);
             }
-        }
-
-        for (List<Object> group : groups.values()) {
-            int n = group.size();
-            for (int i = 0; i < n; i++) {
-                double offset = (i - (n - 1) / 2.0) * LANE_OFFSET_METERS;
-                Object item = group.get(i);
-                if (item instanceof Trip) {
-                    drawTrip((Trip) item, offset);
-                } else if (item instanceof PassengerRequest) {
-                    drawRequest((PassengerRequest) item, offset);
+            for (List<PassengerRequest> group : groups.values()) {
+                int n = group.size();
+                for (int i = 0; i < n; i++) {
+                    double offset = (i - (n - 1) / 2.0) * LANE_OFFSET_METERS;
+                    PassengerRequest req = group.get(i);
+                    int color = colorForId(req.getRequestId(), REQUEST_COLORS);
+                    drawRequestWithColor(req, offset, color);
                 }
             }
         }
     }
 
-    private void drawTrip(Trip trip, double offsetMeters) {
+    private int colorForId(String id, int[] palette) {
+        int hash = Math.abs(id.hashCode());
+        return palette[hash % palette.length];
+    }
+
+    private float markerHueForColor(int argbColor) {
+        int r = (argbColor >> 16) & 0xFF;
+        int g = (argbColor >> 8)  & 0xFF;
+        int b =  argbColor        & 0xFF;
+        float[] hsv = new float[3];
+        android.graphics.Color.RGBToHSV(r, g, b, hsv);
+        return hsv[0];
+    }
+
+    private void drawTripWithColor(Trip trip, double offsetMeters, int color) {
         List<LatLng> raw;
         String encoded = trip.getEncodedPolyline();
         if (encoded != null && !encoded.isEmpty()) {
@@ -418,21 +474,27 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
         List<LatLng> points = applyLaneOffset(raw, offsetMeters);
 
         Polyline polyline = myMap.addPolyline(new PolylineOptions()
-                .width(14f).color(0xFFFFAA00).geodesic(false).clickable(true).addAll(points));
+                .width(16f)
+                .color(color)
+                .geodesic(false)
+                .clickable(true)
+                .addAll(points));
         polyline.setTag("trip:" + trip.getTripId());
+
+        float hue = markerHueForColor(color);
 
         myMap.addMarker(new MarkerOptions()
                 .position(points.get(0))
                 .title(trip.getFromLocation())
                 .snippet(trip.getDriverName())
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
+                .icon(BitmapDescriptorFactory.defaultMarker(hue)));
         myMap.addMarker(new MarkerOptions()
                 .position(points.get(points.size() - 1))
                 .title(trip.getToLocation())
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                .icon(BitmapDescriptorFactory.defaultMarker(hue)));
     }
 
-    private void drawRequest(PassengerRequest req, double offsetMeters) {
+    private void drawRequestWithColor(PassengerRequest req, double offsetMeters, int color) {
         List<LatLng> raw;
         String encoded = req.getEncodedPolyline();
         if (encoded != null && !encoded.isEmpty()) {
@@ -445,18 +507,24 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
         List<LatLng> points = applyLaneOffset(raw, offsetMeters);
 
         Polyline polyline = myMap.addPolyline(new PolylineOptions()
-                .width(14f).color(0xFF4CAF50).geodesic(false).clickable(true).addAll(points));
+                .width(16f)
+                .color(color)
+                .geodesic(false)
+                .clickable(true)
+                .addAll(points));
         polyline.setTag("req:" + req.getRequestId());
+
+        float hue = markerHueForColor(color);
 
         myMap.addMarker(new MarkerOptions()
                 .position(points.get(0))
                 .title(req.getFromLocation())
                 .snippet(req.getPassengerName())
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                .icon(BitmapDescriptorFactory.defaultMarker(hue)));
         myMap.addMarker(new MarkerOptions()
                 .position(points.get(points.size() - 1))
                 .title(req.getToLocation())
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
+                .icon(BitmapDescriptorFactory.defaultMarker(hue)));
     }
 
     private void showDriverRouteInfo(Trip trip, boolean showActions) {
@@ -657,7 +725,8 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions, @NonNull int[] grantResults) {
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == FINE_PERMISSION_CODE) {
             if (grantResults.length > 0
