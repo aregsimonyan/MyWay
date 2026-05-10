@@ -1,5 +1,6 @@
 package com.example.myway;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -28,13 +29,22 @@ public class MyRequestsActivity extends MenuActivity {
 
     private RecyclerView recyclerView;
     private RequestAdapter adapter;
-    private List<PassengerRequest> requestList;
+
+    private List<PassengerRequest> displayList;
+    private List<PassengerRequest> allActive;
+    private List<PassengerRequest> allPast;
+
     private ProgressBar progressRequests;
     private TextView tvEmpty;
+    private TextView tabActive;
+    private TextView tabPast;
+    private View tabIndicator;
     private ImageButton btnMore;
 
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
+
+    private boolean showingActive = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,27 +52,75 @@ public class MyRequestsActivity extends MenuActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_requests);
 
-        db = FirebaseFirestore.getInstance();
+        db    = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
-        recyclerView = findViewById(R.id.recyclerViewRequests);
-        progressRequests = findViewById(R.id.progressRequests);
-        tvEmpty = findViewById(R.id.tvEmptyRequests);
-        btnMore = findViewById(R.id.btnMore);
+        recyclerView      = findViewById(R.id.recyclerViewRequests);
+        progressRequests  = findViewById(R.id.progressRequests);
+        tvEmpty           = findViewById(R.id.tvEmptyRequests);
+        tabActive         = findViewById(R.id.tabActive);
+        tabPast           = findViewById(R.id.tabPast);
+        tabIndicator      = findViewById(R.id.tabIndicator);
+        btnMore           = findViewById(R.id.btnMore);
 
-        requestList = new ArrayList<>();
-        adapter = new RequestAdapter(requestList, this::confirmDelete);
+        displayList = new ArrayList<>();
+        allActive   = new ArrayList<>();
+        allPast     = new ArrayList<>();
 
+        adapter = new RequestAdapter(displayList, this::confirmDelete);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
         setupMoreButton(btnMore);
-        loadMyRequests();
+
+        tabActive.setOnClickListener(v -> switchTab(true));
+        tabPast.setOnClickListener(v -> switchTab(false));
+
+        loadAllMyRequests();
     }
 
-    private void loadMyRequests() {
+    private void switchTab(boolean active) {
+        showingActive = active;
+
+        if (active) {
+            tabActive.setTextColor(getResources().getColor(R.color.colorPrimaryText));
+            tabActive.setTypeface(null, Typeface.BOLD);
+            tabPast.setTextColor(getResources().getColor(R.color.colorSecondaryText));
+            tabPast.setTypeface(null, Typeface.NORMAL);
+            tabIndicator.setTranslationX(0);
+            displayList.clear();
+            displayList.addAll(allActive);
+        } else {
+            tabPast.setTextColor(getResources().getColor(R.color.colorPrimaryText));
+            tabPast.setTypeface(null, Typeface.BOLD);
+            tabActive.setTextColor(getResources().getColor(R.color.colorSecondaryText));
+            tabActive.setTypeface(null, Typeface.NORMAL);
+            tabIndicator.setTranslationX(tabActive.getWidth());
+            displayList.clear();
+            displayList.addAll(allPast);
+        }
+
+        adapter.notifyDataSetChanged();
+        updateEmptyState();
+    }
+
+    private void updateEmptyState() {
+        if (displayList.isEmpty()) {
+            recyclerView.setVisibility(View.GONE);
+            tvEmpty.setVisibility(View.VISIBLE);
+            tvEmpty.setText(showingActive
+                    ? "You have no active ride requests."
+                    : "You have no past ride requests.");
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            tvEmpty.setVisibility(View.GONE);
+        }
+    }
+
+    private void loadAllMyRequests() {
         if (mAuth.getCurrentUser() == null) return;
         String uid = mAuth.getCurrentUser().getUid();
+        long now = System.currentTimeMillis();
 
         progressRequests.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.GONE);
@@ -70,7 +128,6 @@ public class MyRequestsActivity extends MenuActivity {
 
         db.collection("requests")
                 .whereEqualTo("passengerId", uid)
-                .whereGreaterThan("dateTime", System.currentTimeMillis())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -78,18 +135,24 @@ public class MyRequestsActivity extends MenuActivity {
                         progressRequests.setVisibility(View.GONE);
 
                         if (task.isSuccessful()) {
-                            requestList.clear();
+                            allActive.clear();
+                            allPast.clear();
+
                             for (DocumentSnapshot doc : task.getResult()) {
                                 PassengerRequest req = doc.toObject(PassengerRequest.class);
-                                if (req != null) requestList.add(req);
-                            }
-                            adapter.notifyDataSetChanged();
+                                if (req == null) continue;
 
-                            if (requestList.isEmpty()) {
-                                tvEmpty.setVisibility(View.VISIBLE);
-                            } else {
-                                recyclerView.setVisibility(View.VISIBLE);
+                                if (req.getDateTime() > now) {
+                                    allActive.add(req);
+                                } else {
+                                    allPast.add(req);
+                                }
                             }
+
+                            allActive.sort((a, b) -> Long.compare(a.getDateTime(), b.getDateTime()));
+                            allPast.sort((a, b) -> Long.compare(b.getDateTime(), a.getDateTime()));
+
+                            switchTab(true);
                         } else {
                             Toast.makeText(MyRequestsActivity.this,
                                     "Failed to load requests", Toast.LENGTH_SHORT).show();
@@ -116,7 +179,7 @@ public class MyRequestsActivity extends MenuActivity {
                         if (task.isSuccessful()) {
                             Toast.makeText(MyRequestsActivity.this,
                                     "Request deleted", Toast.LENGTH_SHORT).show();
-                            loadMyRequests();
+                            loadAllMyRequests();
                         } else {
                             Toast.makeText(MyRequestsActivity.this,
                                     "Failed to delete: " + task.getException().getMessage(),

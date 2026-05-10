@@ -32,9 +32,9 @@
                 android:layout_marginTop="8dp"/>
 
             <TextView
+                android:id="@+id/tvTripCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/tvTripCount"
                 android:text="Loading trips..."
                 android:textSize="13sp"
                 android:textColor="@color/colorSecondaryText"/>
@@ -105,7 +105,7 @@
                                 android:background="@drawable/circle_green"
                                 android:layout_marginEnd="12dp"/>
 
-                            <EditText
+                            <AutoCompleteTextView
                                 android:id="@+id/etSearchFrom"
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
@@ -116,7 +116,11 @@
                                 android:textColor="@color/colorPrimaryText"
                                 android:textSize="14sp"
                                 android:maxLines="1"
-                                android:inputType="textCapWords"/>
+                                android:inputType="textCapWords"
+                                android:completionThreshold="1"
+                                android:dropDownVerticalOffset="4dp"
+                                android:popupBackground="@color/colorSurface"
+                                android:dropDownWidth="match_parent"/>
 
                         </LinearLayout>
 
@@ -139,7 +143,7 @@
                                 android:background="@drawable/circle_red"
                                 android:layout_marginEnd="12dp"/>
 
-                            <EditText
+                            <AutoCompleteTextView
                                 android:id="@+id/etSearchTo"
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
@@ -150,7 +154,11 @@
                                 android:textColor="@color/colorPrimaryText"
                                 android:textSize="14sp"
                                 android:maxLines="1"
-                                android:inputType="textCapWords"/>
+                                android:inputType="textCapWords"
+                                android:completionThreshold="1"
+                                android:dropDownVerticalOffset="4dp"
+                                android:popupBackground="@color/colorSurface"
+                                android:dropDownWidth="match_parent"/>
 
                         </LinearLayout>
 
@@ -172,12 +180,14 @@
                     app:iconTint="@color/colorButtonText"
                     android:backgroundTint="@color/colorButton"
                     android:textColor="@color/colorButtonText"
-                    android:layout_marginBottom="14dp"/>
+                    android:layout_marginBottom="10dp"/>
 
+                <!-- Row: Live Map | My Requests | My Bookings -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnOpenMap"
@@ -197,21 +207,23 @@
                         android:textColor="#FFFFFF"/>
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnPostRequest"
+                        android:id="@+id/btnMyRequests"
                         android:layout_width="0dp"
                         android:layout_height="52dp"
                         android:layout_weight="1"
                         android:layout_marginEnd="6dp"
-                        android:text="Post Request"
+                        android:text="My Requests"
                         android:textSize="12sp"
                         android:textStyle="bold"
                         android:textAllCaps="false"
                         app:cornerRadius="10dp"
-                        app:icon="@android:drawable/ic_input_add"
+                        app:icon="@android:drawable/ic_menu_recent_history"
                         app:iconGravity="textStart"
-                        app:iconTint="#111111"
-                        android:backgroundTint="#4CAF50"
-                        android:textColor="#111111"/>
+                        app:iconTint="@color/colorPrimaryText"
+                        android:backgroundTint="@color/colorSurface"
+                        android:textColor="@color/colorPrimaryText"
+                        app:strokeColor="@color/colorCardBorder"
+                        app:strokeWidth="1dp"/>
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnMyBookings"
@@ -232,6 +244,22 @@
                         app:strokeWidth="1dp"/>
 
                 </LinearLayout>
+
+                <!-- Full-width Post Request button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnPostRequest"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:text="Post a Ride Request"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"
+                    app:cornerRadius="10dp"
+                    app:icon="@android:drawable/ic_input_add"
+                    app:iconGravity="textStart"
+                    app:iconTint="#111111"
+                    android:backgroundTint="#4CAF50"
+                    android:textColor="#111111"/>
 
             </LinearLayout>
 

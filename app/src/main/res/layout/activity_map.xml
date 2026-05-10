@@ -189,6 +189,7 @@
                 android:background="#E0E0E0"
                 android:layout_marginBottom="10dp"/>
 
+            <!-- Driver info section -->
             <LinearLayout
                 android:id="@+id/layoutDriverInfo"
                 android:layout_width="match_parent"
@@ -388,6 +389,7 @@
 
             </LinearLayout>
 
+            <!-- Passenger info section -->
             <LinearLayout
                 android:id="@+id/layoutPassengerInfo"
                 android:layout_width="match_parent"
@@ -440,7 +442,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="6dp">
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -455,6 +458,72 @@
                         android:textColor="#333333"
                         android:textSize="13sp"
                         android:textStyle="bold"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="14dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Phone"
+                        android:textColor="#888888"
+                        android:textSize="12sp"/>
+                    <TextView
+                        android:id="@+id/tvInfoPassengerPhone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#333333"
+                        android:textSize="13sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#E0E0E0"
+                    android:layout_marginBottom="12dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnShowAllRequestRoutes"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:text="← All Routes"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textAllCaps="false"
+                        android:textColor="#555555"
+                        android:backgroundTint="#E0E0E0"
+                        app:cornerRadius="10dp"
+                        android:visibility="gone"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCallPassenger"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="Call Passenger"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF"
+                        android:backgroundTint="#2E7D32"
+                        app:cornerRadius="10dp"
+                        app:icon="@android:drawable/ic_menu_call"
+                        app:iconGravity="textStart"
+                        app:iconTint="#FFFFFF"
+                        android:visibility="gone"/>
+
                 </LinearLayout>
 
             </LinearLayout>
@@ -474,6 +543,6 @@
         app:layout_constraintBottom_toTopOf="@id/cardRouteInfo"
         app:layout_constraintEnd_toEndOf="parent"
         app:rippleColor="#E0E0E0"
-        app:tint="#212121" />
+        app:tint="#212121"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

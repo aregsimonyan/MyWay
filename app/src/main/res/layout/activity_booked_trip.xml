@@ -22,7 +22,7 @@
             android:text="My Booking"
             android:textColor="@color/colorPrimaryText"
             android:textSize="22sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"/>
 
     </RelativeLayout>
 
@@ -85,7 +85,6 @@
 
                 </LinearLayout>
 
-                <!-- Trip details card -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -286,7 +285,6 @@
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-                <!-- Countdown card -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -316,8 +314,8 @@
                             android:id="@+id/tvCountdown"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="-- d  -- h  -- m  -- s"
-                            android:textSize="30sp"
+                            android:text="-- d  -- h  -- m"
+                            android:textSize="32sp"
                             android:textStyle="bold"
                             android:textColor="@color/colorPrimaryText"
                             android:fontFamily="monospace"
@@ -327,7 +325,7 @@
                             android:id="@+id/tvCountdownLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="days          hours         min           sec"
+                            android:text="days              hours             min"
                             android:textSize="11sp"
                             android:textColor="@color/colorSecondaryText"
                             android:letterSpacing="0.03"/>

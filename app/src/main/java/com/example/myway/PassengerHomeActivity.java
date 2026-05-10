@@ -3,7 +3,8 @@ package com.example.myway;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -29,16 +30,19 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Transaction;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public class PassengerHomeActivity extends MenuActivity {
 
-    private EditText etSearchFrom;
-    private EditText etSearchTo;
+    private AutoCompleteTextView etSearchFrom;
+    private AutoCompleteTextView etSearchTo;
     private MaterialButton btnSearch;
     private MaterialButton btnOpenMap;
-    private MaterialButton btnPostRequest;
+    private MaterialButton btnMyRequests;
     private MaterialButton btnMyBookings;
+    private MaterialButton btnPostRequest;
     private ImageButton btnMore;
     private RecyclerView recyclerView;
     private TripAdapter adapter;
@@ -49,6 +53,9 @@ public class PassengerHomeActivity extends MenuActivity {
     private List<Trip> tripList;
     private List<Trip> allTripList;
 
+    private ArrayAdapter<String> fromSuggestionsAdapter;
+    private ArrayAdapter<String> toSuggestionsAdapter;
+
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
 
@@ -58,23 +65,35 @@ public class PassengerHomeActivity extends MenuActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_passenger_home);
 
-        db = FirebaseFirestore.getInstance();
+        db    = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
-        etSearchFrom = findViewById(R.id.etSearchFrom);
-        etSearchTo = findViewById(R.id.etSearchTo);
-        btnSearch = findViewById(R.id.btnSearch);
-        btnOpenMap = findViewById(R.id.btnOpenMap);
+        etSearchFrom   = findViewById(R.id.etSearchFrom);
+        etSearchTo     = findViewById(R.id.etSearchTo);
+        btnSearch      = findViewById(R.id.btnSearch);
+        btnOpenMap     = findViewById(R.id.btnOpenMap);
+        btnMyRequests  = findViewById(R.id.btnMyRequests);
+        btnMyBookings  = findViewById(R.id.btnMyBookings);
         btnPostRequest = findViewById(R.id.btnPostRequest);
-        btnMyBookings = findViewById(R.id.btnMyBookings);
-        btnMore = findViewById(R.id.btnMore);
-        recyclerView = findViewById(R.id.recyclerViewTrips);
-        tvTripCount = findViewById(R.id.tvTripCount);
-        tvEmptyTrips = findViewById(R.id.tvEmptyTrips);
-        progressTrips = findViewById(R.id.progressTrips);
+        btnMore        = findViewById(R.id.btnMore);
+        recyclerView   = findViewById(R.id.recyclerViewTrips);
+        tvTripCount    = findViewById(R.id.tvTripCount);
+        tvEmptyTrips   = findViewById(R.id.tvEmptyTrips);
+        progressTrips  = findViewById(R.id.progressTrips);
 
-        tripList = new ArrayList<>();
+        tripList    = new ArrayList<>();
         allTripList = new ArrayList<>();
+
+        fromSuggestionsAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, new ArrayList<>());
+        toSuggestionsAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, new ArrayList<>());
+
+        etSearchFrom.setAdapter(fromSuggestionsAdapter);
+        etSearchTo.setAdapter(toSuggestionsAdapter);
+
+        etSearchFrom.setOnItemClickListener((parent, view, position, id) -> searchTrips());
+        etSearchTo.setOnItemClickListener((parent, view, position, id) -> searchTrips());
 
         String currentUserId = mAuth.getCurrentUser() != null
                 ? mAuth.getCurrentUser().getUid() : "";
@@ -100,11 +119,14 @@ public class PassengerHomeActivity extends MenuActivity {
         btnOpenMap.setOnClickListener(v ->
                 startActivity(new Intent(this, MapActivity.class)));
 
-        btnPostRequest.setOnClickListener(v ->
-                startActivity(new Intent(this, PostPassengerRequestActivity.class)));
+        btnMyRequests.setOnClickListener(v ->
+                startActivity(new Intent(this, MyRequestsActivity.class)));
 
         btnMyBookings.setOnClickListener(v ->
                 startActivity(new Intent(this, MyBookingsActivity.class)));
+
+        btnPostRequest.setOnClickListener(v ->
+                startActivity(new Intent(this, PostPassengerRequestActivity.class)));
 
         setupMoreButton(btnMore);
         loadAllTrips();
@@ -143,17 +165,22 @@ public class PassengerHomeActivity extends MenuActivity {
                                     allTripList.add(trip);
                                 }
                             }
+
                             tripList.clear();
                             tripList.addAll(allTripList);
                             adapter.notifyDataSetChanged();
 
                             int count = allTripList.size();
-                            tvTripCount.setText(count + " ride" + (count == 1 ? "" : "s") + " available");
+                            tvTripCount.setText(count + " ride"
+                                    + (count == 1 ? "" : "s") + " available");
 
                             if (tripList.isEmpty()) {
                                 tvEmptyTrips.setText("No trips available right now.");
                                 tvEmptyTrips.setVisibility(View.VISIBLE);
                             }
+
+                            refreshSuggestions();
+
                         } else {
                             tvTripCount.setText("Could not load trips");
                         }
@@ -161,9 +188,31 @@ public class PassengerHomeActivity extends MenuActivity {
                 });
     }
 
+    private void refreshSuggestions() {
+        Set<String> fromSet = new LinkedHashSet<>();
+        Set<String> toSet   = new LinkedHashSet<>();
+
+        for (Trip trip : allTripList) {
+            if (trip.getFromLocation() != null && !trip.getFromLocation().isEmpty()) {
+                fromSet.add(trip.getFromLocation());
+            }
+            if (trip.getToLocation() != null && !trip.getToLocation().isEmpty()) {
+                toSet.add(trip.getToLocation());
+            }
+        }
+
+        fromSuggestionsAdapter.clear();
+        fromSuggestionsAdapter.addAll(new ArrayList<>(fromSet));
+        fromSuggestionsAdapter.notifyDataSetChanged();
+
+        toSuggestionsAdapter.clear();
+        toSuggestionsAdapter.addAll(new ArrayList<>(toSet));
+        toSuggestionsAdapter.notifyDataSetChanged();
+    }
+
     private void searchTrips() {
         String from = etSearchFrom.getText().toString().trim().toLowerCase();
-        String to = etSearchTo.getText().toString().trim().toLowerCase();
+        String to   = etSearchTo.getText().toString().trim().toLowerCase();
 
         tripList.clear();
         for (Trip trip : allTripList) {
@@ -184,7 +233,8 @@ public class PassengerHomeActivity extends MenuActivity {
             tvEmptyTrips.setVisibility(View.GONE);
         }
 
-        tvTripCount.setText(tripList.size() + " result" + (tripList.size() == 1 ? "" : "s") + " found");
+        tvTripCount.setText(tripList.size() + " result"
+                + (tripList.size() == 1 ? "" : "s") + " found");
     }
 
     private void confirmBooking(Trip trip) {

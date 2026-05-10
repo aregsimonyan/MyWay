@@ -6,6 +6,7 @@
     android:orientation="vertical"
     android:background="@color/colorBackground">
 
+    <!-- Top bar -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -40,6 +41,45 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/colorTopBarDivider"/>
+
+    <!-- Tab bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/colorTopBar"
+        android:paddingHorizontal="16dp">
+
+        <TextView
+            android:id="@+id/tabActive"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="ACTIVE"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimaryText"/>
+
+        <TextView
+            android:id="@+id/tabPast"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="PAST"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorSecondaryText"/>
+
+    </LinearLayout>
+
+    <!-- Tab underline indicator -->
+    <View
+        android:id="@+id/tabIndicator"
+        android:layout_width="0dp"
+        android:layout_height="3dp"
+        android:background="@color/colorButton"/>
 
     <ProgressBar
         android:id="@+id/progressRequests"

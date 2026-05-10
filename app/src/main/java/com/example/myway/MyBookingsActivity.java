@@ -1,6 +1,7 @@
 package com.example.myway;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -28,13 +29,22 @@ public class MyBookingsActivity extends MenuActivity {
 
     private RecyclerView recyclerView;
     private TripAdapter adapter;
-    private List<Trip> bookedTrips;
+
+    private List<Trip> displayList;
+    private List<Trip> allUpcoming;
+    private List<Trip> allPast;
+
     private ProgressBar progressBookings;
     private TextView tvEmpty;
+    private TextView tabUpcoming;
+    private TextView tabPast;
+    private View tabIndicator;
     private ImageButton btnMore;
 
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
+
+    private boolean showingUpcoming = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,17 +58,24 @@ public class MyBookingsActivity extends MenuActivity {
         recyclerView     = findViewById(R.id.recyclerViewBookings);
         progressBookings = findViewById(R.id.progressBookings);
         tvEmpty          = findViewById(R.id.tvEmptyBookings);
+        tabUpcoming      = findViewById(R.id.tabUpcoming);
+        tabPast          = findViewById(R.id.tabPast);
+        tabIndicator     = findViewById(R.id.tabIndicator);
         btnMore          = findViewById(R.id.btnMore);
 
-        bookedTrips = new ArrayList<>();
+        displayList  = new ArrayList<>();
+        allUpcoming  = new ArrayList<>();
+        allPast      = new ArrayList<>();
 
         String currentUserId = mAuth.getCurrentUser() != null
                 ? mAuth.getCurrentUser().getUid() : "";
 
-        adapter = new TripAdapter(bookedTrips, currentUserId,
+        adapter = new TripAdapter(displayList, currentUserId,
                 new TripAdapter.OnTripActionListener() {
                     @Override
                     public void onCardClick(Trip trip) {
+                        // For upcoming trips open the full booking detail screen;
+                        // for past trips the same screen shows the expired countdown
                         Intent intent = new Intent(MyBookingsActivity.this,
                                 BookedTripActivity.class);
                         intent.putExtra("tripId", trip.getTripId());
@@ -67,7 +84,6 @@ public class MyBookingsActivity extends MenuActivity {
 
                     @Override
                     public void onBookClick(Trip trip) {
-                        // Already booked — no action needed
                     }
                 });
 
@@ -75,25 +91,66 @@ public class MyBookingsActivity extends MenuActivity {
         recyclerView.setAdapter(adapter);
 
         setupMoreButton(btnMore);
-        loadMyBookings();
+
+        tabUpcoming.setOnClickListener(v -> switchTab(true));
+        tabPast.setOnClickListener(v -> switchTab(false));
+
+        loadAllMyBookings();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        loadMyBookings();
+        loadAllMyBookings();
     }
 
-    private void loadMyBookings() {
+    private void switchTab(boolean upcoming) {
+        showingUpcoming = upcoming;
+
+        if (upcoming) {
+            tabUpcoming.setTextColor(getResources().getColor(R.color.colorPrimaryText));
+            tabUpcoming.setTypeface(null, Typeface.BOLD);
+            tabPast.setTextColor(getResources().getColor(R.color.colorSecondaryText));
+            tabPast.setTypeface(null, Typeface.NORMAL);
+            tabIndicator.setTranslationX(0);
+            displayList.clear();
+            displayList.addAll(allUpcoming);
+        } else {
+            tabPast.setTextColor(getResources().getColor(R.color.colorPrimaryText));
+            tabPast.setTypeface(null, Typeface.BOLD);
+            tabUpcoming.setTextColor(getResources().getColor(R.color.colorSecondaryText));
+            tabUpcoming.setTypeface(null, Typeface.NORMAL);
+            tabIndicator.setTranslationX(tabUpcoming.getWidth());
+            displayList.clear();
+            displayList.addAll(allPast);
+        }
+
+        adapter.notifyDataSetChanged();
+        updateEmptyState();
+    }
+
+    private void updateEmptyState() {
+        if (displayList.isEmpty()) {
+            recyclerView.setVisibility(View.GONE);
+            tvEmpty.setVisibility(View.VISIBLE);
+            tvEmpty.setText(showingUpcoming
+                    ? "You have no upcoming bookings."
+                    : "You have no past bookings.");
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            tvEmpty.setVisibility(View.GONE);
+        }
+    }
+
+    private void loadAllMyBookings() {
         if (mAuth.getCurrentUser() == null) return;
         String uid = mAuth.getCurrentUser().getUid();
+        long now = System.currentTimeMillis();
 
         progressBookings.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.GONE);
         tvEmpty.setVisibility(View.GONE);
 
-        // Using only whereArrayContains avoids the need for a composite Firestore index.
-        // We filter out past trips ourselves in Java below.
         db.collection("trips")
                 .whereArrayContains("passengerIds", uid)
                 .get()
@@ -103,26 +160,26 @@ public class MyBookingsActivity extends MenuActivity {
                         progressBookings.setVisibility(View.GONE);
 
                         if (task.isSuccessful()) {
-                            bookedTrips.clear();
-                            long now = System.currentTimeMillis();
+                            allUpcoming.clear();
+                            allPast.clear();
 
                             for (DocumentSnapshot doc : task.getResult()) {
                                 Trip trip = doc.toObject(Trip.class);
-                                if (trip != null && trip.getDateTime() > now) {
-                                    bookedTrips.add(trip);
+                                if (trip == null) continue;
+
+                                if (trip.getDateTime() > now) {
+                                    allUpcoming.add(trip);
+                                } else {
+                                    allPast.add(trip);
                                 }
                             }
 
-                            bookedTrips.sort((a, b) ->
+                            allUpcoming.sort((a, b) ->
                                     Long.compare(a.getDateTime(), b.getDateTime()));
+                            allPast.sort((a, b) ->
+                                    Long.compare(b.getDateTime(), a.getDateTime()));
 
-                            adapter.notifyDataSetChanged();
-
-                            if (bookedTrips.isEmpty()) {
-                                tvEmpty.setVisibility(View.VISIBLE);
-                            } else {
-                                recyclerView.setVisibility(View.VISIBLE);
-                            }
+                            switchTab(showingUpcoming);
 
                         } else {
                             Toast.makeText(MyBookingsActivity.this,

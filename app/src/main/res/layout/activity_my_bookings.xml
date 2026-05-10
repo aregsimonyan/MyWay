@@ -34,10 +34,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Your upcoming booked rides"
+                android:text="Your booked rides"
                 android:textColor="@color/colorSecondaryText"
                 android:textSize="13sp"
-                android:layout_marginTop="8dp"/>
+                android:layout_marginTop="4dp"/>
 
         </LinearLayout>
 
@@ -57,6 +57,43 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/colorTopBarDivider"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/colorTopBar"
+        android:paddingHorizontal="16dp">
+
+        <TextView
+            android:id="@+id/tabUpcoming"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="UPCOMING"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimaryText"/>
+
+        <TextView
+            android:id="@+id/tabPast"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="PAST"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorSecondaryText"/>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/tabIndicator"
+        android:layout_width="0dp"
+        android:layout_height="3dp"
+        android:background="@color/colorButton"/>
 
     <ProgressBar
         android:id="@+id/progressBookings"

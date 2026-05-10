@@ -60,20 +60,20 @@ public class BookedTripActivity extends AppCompatActivity {
 
         tripId = getIntent().getStringExtra("tripId");
 
-        progressBooked      = findViewById(R.id.progressBooked);
-        layoutContent       = findViewById(R.id.layoutContent);
-        tvBookedRoute       = findViewById(R.id.tvBookedRoute);
-        tvBookedDateTime    = findViewById(R.id.tvBookedDateTime);
-        tvBookedPrice       = findViewById(R.id.tvBookedPrice);
-        tvBookedDriver      = findViewById(R.id.tvBookedDriver);
-        tvBookedCarModel    = findViewById(R.id.tvBookedCarModel);
-        tvBookedCarCategory = findViewById(R.id.tvBookedCarCategory);
+        progressBooked       = findViewById(R.id.progressBooked);
+        layoutContent        = findViewById(R.id.layoutContent);
+        tvBookedRoute        = findViewById(R.id.tvBookedRoute);
+        tvBookedDateTime     = findViewById(R.id.tvBookedDateTime);
+        tvBookedPrice        = findViewById(R.id.tvBookedPrice);
+        tvBookedDriver       = findViewById(R.id.tvBookedDriver);
+        tvBookedCarModel     = findViewById(R.id.tvBookedCarModel);
+        tvBookedCarCategory  = findViewById(R.id.tvBookedCarCategory);
         tvBookedLicensePlate = findViewById(R.id.tvBookedLicensePlate);
-        btnCallDriver       = findViewById(R.id.btnCallDriver);
-        tvCountdown         = findViewById(R.id.tvCountdown);
-        tvCountdownLabel    = findViewById(R.id.tvCountdownLabel);
-        btnViewOnMap        = findViewById(R.id.btnViewOnMap);
-        btnCancelBooking    = findViewById(R.id.btnCancelBooking);
+        btnCallDriver        = findViewById(R.id.btnCallDriver);
+        tvCountdown          = findViewById(R.id.tvCountdown);
+        tvCountdownLabel     = findViewById(R.id.tvCountdownLabel);
+        btnViewOnMap         = findViewById(R.id.btnViewOnMap);
+        btnCancelBooking     = findViewById(R.id.btnCancelBooking);
 
         if (tripId == null) {
             Toast.makeText(this, "Trip not found.", Toast.LENGTH_SHORT).show();
@@ -176,16 +176,12 @@ public class BookedTripActivity extends AppCompatActivity {
             return;
         }
 
-        countDownTimer = new CountDownTimer(remaining, 1000) {
+        updateCountdownText(remaining);
+
+        countDownTimer = new CountDownTimer(remaining, 60_000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                long days    = millisUntilFinished / (1000 * 60 * 60 * 24);
-                long hours   = (millisUntilFinished % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);
-                long minutes = (millisUntilFinished % (1000 * 60 * 60)) / (1000 * 60);
-                long seconds = (millisUntilFinished % (1000 * 60)) / 1000;
-                tvCountdown.setText(String.format(Locale.US,
-                        "%02d d  %02d h  %02d m  %02d s",
-                        days, hours, minutes, seconds));
+                updateCountdownText(millisUntilFinished);
             }
 
             @Override
@@ -195,6 +191,14 @@ public class BookedTripActivity extends AppCompatActivity {
                 btnCancelBooking.setVisibility(View.GONE);
             }
         }.start();
+    }
+
+    private void updateCountdownText(long millis) {
+        long days    = millis / (1000 * 60 * 60 * 24);
+        long hours   = (millis % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);
+        long minutes = (millis % (1000 * 60 * 60)) / (1000 * 60);
+        tvCountdown.setText(String.format(Locale.US,
+                "%02d d  %02d h  %02d m", days, hours, minutes));
     }
 
     private void confirmCancel(Trip trip) {
