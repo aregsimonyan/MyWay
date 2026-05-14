@@ -1,5 +1,6 @@
 package com.example.myway.adapters;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,16 +11,18 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myway.R;
+import com.example.myway.TripPassengersActivity;
 import com.example.myway.models.Trip;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
-public class DriverTripAdapter extends RecyclerView.Adapter<DriverTripAdapter.DriverTripViewHolder> {
+public class DriverTripAdapter
+        extends RecyclerView.Adapter<DriverTripAdapter.DriverTripViewHolder> {
 
-    private List<Trip> tripList;
-    private OnDeleteClickListener listener;
+    private final List<Trip>            tripList;
+    private final OnDeleteClickListener listener;
 
     public interface OnDeleteClickListener {
         void onDeleteClick(Trip trip);
@@ -45,8 +48,12 @@ public class DriverTripAdapter extends RecyclerView.Adapter<DriverTripAdapter.Dr
 
         holder.tvRoute.setText(trip.getFromLocation() + "  →  " + trip.getToLocation());
         holder.tvDateTime.setText(sdf.format(trip.getDateTime()));
+
+        int booked = trip.getTotalSeats() - trip.getSeatsAvailable();
         holder.tvPrice.setText((int) trip.getPricePerSeat() + " AMD  ·  "
-                + trip.getSeatsAvailable() + "/" + trip.getTotalSeats() + " seats left");
+                + trip.getSeatsAvailable() + "/" + trip.getTotalSeats() + " seats left"
+                + (booked > 0 ? "  (" + booked + " booked)" : ""));
+
         holder.tvCar.setText(trip.getCarCategory() + "  ·  " + trip.getLicensePlate());
 
         long now = System.currentTimeMillis();
@@ -60,12 +67,16 @@ public class DriverTripAdapter extends RecyclerView.Adapter<DriverTripAdapter.Dr
             holder.btnDelete.setVisibility(View.VISIBLE);
             holder.btnDelete.setOnClickListener(v -> listener.onDeleteClick(trip));
         }
+
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), TripPassengersActivity.class);
+            intent.putExtra(TripPassengersActivity.EXTRA_TRIP_ID, trip.getTripId());
+            v.getContext().startActivity(intent);
+        });
     }
 
     @Override
-    public int getItemCount() {
-        return tripList.size();
-    }
+    public int getItemCount() { return tripList.size(); }
 
     public static class DriverTripViewHolder extends RecyclerView.ViewHolder {
         TextView tvRoute;
@@ -73,16 +84,16 @@ public class DriverTripAdapter extends RecyclerView.Adapter<DriverTripAdapter.Dr
         TextView tvPrice;
         TextView tvCar;
         TextView tvStatus;
-        Button btnDelete;
+        Button   btnDelete;
 
         public DriverTripViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvRoute = itemView.findViewById(R.id.tvDriverTripRoute);
+            tvRoute    = itemView.findViewById(R.id.tvDriverTripRoute);
             tvDateTime = itemView.findViewById(R.id.tvDriverTripDateTime);
-            tvPrice = itemView.findViewById(R.id.tvDriverTripPrice);
-            tvCar = itemView.findViewById(R.id.tvDriverTripCar);
-            tvStatus = itemView.findViewById(R.id.tvDriverTripStatus);
-            btnDelete = itemView.findViewById(R.id.btnDeleteTrip);
+            tvPrice    = itemView.findViewById(R.id.tvDriverTripPrice);
+            tvCar      = itemView.findViewById(R.id.tvDriverTripCar);
+            tvStatus   = itemView.findViewById(R.id.tvDriverTripStatus);
+            btnDelete  = itemView.findViewById(R.id.btnDeleteTrip);
         }
     }
 }

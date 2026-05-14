@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="6dp"
+    android:elevation="2dp"
+    app:cardBackgroundColor="@color/colorCard"
+    app:cardCornerRadius="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:id="@+id/tvPassengerNumber"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:gravity="center"
+                android:text="#1"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/circle_green"
+                android:layout_marginEnd="12dp"/>
+
+            <TextView
+                android:id="@+id/tvPassengerName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorPrimaryText"/>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorDivider"
+            android:layout_marginBottom="10dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="6dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Phone"
+                android:textSize="12sp"
+                android:textColor="@color/colorSecondaryText"/>
+
+            <TextView
+                android:id="@+id/tvPassengerPhone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorPrimaryText"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="14dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Email"
+                android:textSize="12sp"
+                android:textColor="@color/colorSecondaryText"/>
+
+            <TextView
+                android:id="@+id/tvPassengerEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorPrimaryText"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCallPassenger"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Call Passenger"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#2E7D32"
+            app:cornerRadius="10dp"
+            app:icon="@android:drawable/ic_menu_call"
+            app:iconGravity="textStart"
+            app:iconTint="#FFFFFF"/>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

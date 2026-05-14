@@ -5,7 +5,6 @@ plugins {
     id("com.google.gms.google-services")
 }
 
-// Reads local.properties file from the root project folder
 val localProperties = Properties()
 val localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
@@ -29,8 +28,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        manifestPlaceholders["MAPS_API_KEY"] = localProperties.getProperty("MAPS_API_KEY") ?: ""
-        buildConfigField("String", "DIRECTIONS_API_KEY", "\"${localProperties.getProperty("DIRECTIONS_API_KEY") ?: ""}\"")
+        manifestPlaceholders["MAPS_API_KEY"] =
+            localProperties.getProperty("MAPS_API_KEY") ?: ""
+        buildConfigField(
+            "String", "DIRECTIONS_API_KEY",
+            "\"${localProperties.getProperty("DIRECTIONS_API_KEY") ?: ""}\""
+        )
     }
 
     buildTypes {
@@ -60,6 +63,7 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-messaging")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("com.google.android.gms:play-services-auth:21.0.0")
