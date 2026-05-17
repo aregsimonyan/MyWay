@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/colorBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:paddingHorizontal="28dp"
+        android:paddingTop="60dp"
+        android:paddingBottom="48dp">
+
+        <TextView
+            android:id="@+id/tvRatingTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="How was your driver?"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimaryText"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/tvRatingSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rate your experience"
+            android:textSize="15sp"
+            android:textColor="@color/colorSecondaryText"
+            android:gravity="center"
+            android:layout_marginBottom="40dp"/>
+
+        <FrameLayout
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_marginBottom="28dp">
+
+            <ImageView
+                android:id="@+id/ivRatingAvatar"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:scaleType="centerCrop"
+                android:background="@drawable/circle_green"
+                android:visibility="gone"/>
+
+            <FrameLayout
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:background="@drawable/avatar_circle_bg">
+
+                <TextView
+                    android:id="@+id/tvAvatarInitials"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="?"
+                    android:textSize="32sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"/>
+            </FrameLayout>
+        </FrameLayout>
+
+        <RatingBar
+            android:id="@+id/ratingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:rating="0"
+            android:stepSize="1"
+            android:scaleX="1.15"
+            android:scaleY="1.15"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:id="@+id/tvRatingLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimaryText"
+            android:layout_marginBottom="48dp"
+            android:visibility="invisible"/>
+
+        <ProgressBar
+            android:id="@+id/progressSubmit"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="12dp"
+            android:indeterminateTint="@color/colorButton"
+            android:visibility="gone"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSubmitRating"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Submit Rating"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            android:backgroundTint="@color/colorButton"
+            android:textColor="@color/colorButtonText"
+            app:cornerRadius="14dp"
+            android:layout_marginBottom="14dp"/>
+
+        <TextView
+            android:id="@+id/btnSkipRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Skip for now"
+            android:textSize="14sp"
+            android:textColor="@color/colorSecondaryText"
+            android:padding="8dp"
+            android:clickable="true"
+            android:focusable="true"/>
+
+    </LinearLayout>
+</ScrollView>

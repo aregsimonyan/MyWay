@@ -6,6 +6,9 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -48,10 +51,15 @@
         <activity android:name=".MyBookingsActivity"            android:exported="false" />
         <activity android:name=".EditProfileActivity"           android:exported="false" />
         <activity android:name=".AddRoleActivity"               android:exported="false" />
+        <activity android:name=".RatingActivity"                android:exported="false" />
 
         <activity
             android:name=".TripPassengersActivity"
             android:exported="true" />
+
+        <receiver
+            android:name=".RatingNotificationReceiver"
+            android:exported="false" />
 
         <service
             android:name=".BookingListenerService"

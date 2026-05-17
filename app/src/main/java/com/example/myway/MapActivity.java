@@ -750,7 +750,7 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
                 myMap.getUiSettings().setMyLocationButtonEnabled(false);
             }
             getLastLocation();
-        } else {
+        } else {    
             Toast.makeText(this, "Location permission denied.", Toast.LENGTH_SHORT).show();
         }
     }

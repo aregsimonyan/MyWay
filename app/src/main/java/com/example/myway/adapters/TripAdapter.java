@@ -11,8 +11,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myway.R;
 import com.example.myway.models.Trip;
+import com.example.myway.utils.RatingUtils;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -20,19 +22,20 @@ import java.util.Locale;
 
 public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder> {
 
-    private List<Trip> tripList;
-    private String currentUserId;
-    private OnTripActionListener listener;
+    private final List<Trip> tripList;
+    private final String     currentUserId;
+    private final OnTripActionListener listener;
 
     public interface OnTripActionListener {
         void onCardClick(Trip trip);
         void onBookClick(Trip trip);
     }
 
-    public TripAdapter(List<Trip> tripList, String currentUserId, OnTripActionListener listener) {
-        this.tripList = tripList;
+    public TripAdapter(List<Trip> tripList, String currentUserId,
+                       OnTripActionListener listener) {
+        this.tripList      = tripList;
         this.currentUserId = currentUserId;
-        this.listener = listener;
+        this.listener      = listener;
     }
 
     @NonNull
@@ -58,12 +61,26 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
 
         String category = trip.getCarCategory() != null ? trip.getCarCategory() : "Economy";
         holder.tvCategory.setText(category);
-        if ("Business".equals(category)) {
-            holder.tvCategory.setBackgroundColor(0xFFFFAA00);
-        } else if ("Comfort".equals(category)) {
-            holder.tvCategory.setBackgroundColor(0xFF1E88E5);
-        } else {
-            holder.tvCategory.setBackgroundColor(0xFF555555);
+        if ("Business".equals(category))      holder.tvCategory.setBackgroundColor(0xFFFFAA00);
+        else if ("Comfort".equals(category))  holder.tvCategory.setBackgroundColor(0xFF1E88E5);
+        else                                   holder.tvCategory.setBackgroundColor(0xFF555555);
+
+        holder.tvDriverRating.setVisibility(View.GONE);
+        if (trip.getDriverId() != null && !trip.getDriverId().isEmpty()) {
+            FirebaseFirestore.getInstance()
+                    .collection("users")
+                    .document(trip.getDriverId())
+                    .get()
+                    .addOnSuccessListener(doc -> {
+                        if (doc == null) return;
+                        Double avg   = doc.getDouble("averageRating");
+                        Long   count = doc.getLong("ratingCount");
+                        if (avg != null && count != null && count > 0) {
+                            holder.tvDriverRating.setText(
+                                    RatingUtils.buildStarsText(avg, count.intValue()));
+                            holder.tvDriverRating.setVisibility(View.VISIBLE);
+                        }
+                    });
         }
 
         boolean isBooked = trip.getPassengerIds() != null
@@ -91,25 +108,25 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
     }
 
     @Override
-    public int getItemCount() {
-        return tripList.size();
-    }
+    public int getItemCount() { return tripList.size(); }
 
     public static class TripViewHolder extends RecyclerView.ViewHolder {
         MaterialCardView cardTrip;
-        TextView tvRoute, tvDateTime, tvDriverInfo, tvPrice, tvSeats, tvCategory;
+        TextView tvRoute, tvDateTime, tvDriverInfo, tvDriverRating,
+                tvPrice, tvSeats, tvCategory;
         MaterialButton btnBook;
 
         public TripViewHolder(@NonNull View itemView) {
             super(itemView);
-            cardTrip = itemView.findViewById(R.id.cardTrip);
-            tvRoute = itemView.findViewById(R.id.tvRoute);
-            tvDateTime = itemView.findViewById(R.id.tvDateTime);
-            tvDriverInfo = itemView.findViewById(R.id.tvDriverInfo);
-            tvPrice = itemView.findViewById(R.id.tvPrice);
-            tvSeats = itemView.findViewById(R.id.tvSeats);
-            tvCategory = itemView.findViewById(R.id.tvCategory);
-            btnBook = itemView.findViewById(R.id.btnBook);
+            cardTrip       = itemView.findViewById(R.id.cardTrip);
+            tvRoute        = itemView.findViewById(R.id.tvRoute);
+            tvDateTime     = itemView.findViewById(R.id.tvDateTime);
+            tvDriverInfo   = itemView.findViewById(R.id.tvDriverInfo);
+            tvDriverRating = itemView.findViewById(R.id.tvDriverRating);
+            tvPrice        = itemView.findViewById(R.id.tvPrice);
+            tvSeats        = itemView.findViewById(R.id.tvSeats);
+            tvCategory     = itemView.findViewById(R.id.tvCategory);
+            btnBook        = itemView.findViewById(R.id.btnBook);
         }
     }
 }

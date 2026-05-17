@@ -1,5 +1,6 @@
 package com.example.myway;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myway.adapters.PassengerAdapter;
 import com.example.myway.models.BookedPassenger;
 import com.example.myway.models.Trip;
+import com.example.myway.utils.RatingUtils;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.ListenerRegistration;
 
@@ -39,9 +41,10 @@ public class TripPassengersActivity extends MenuActivity {
     private ImageButton  btnMore;
 
     private final List<BookedPassenger> passengerList = new ArrayList<>();
-    private PassengerAdapter adapter;
+    private PassengerAdapter   adapter;
     private ListenerRegistration tripListener;
     private String tripId;
+    private boolean tripEnded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +72,7 @@ public class TripPassengersActivity extends MenuActivity {
 
         setupMoreButton(btnMore);
 
-        adapter = new PassengerAdapter(passengerList);
+        adapter = new PassengerAdapter(passengerList, this::openRatePassenger, () -> tripEnded);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
@@ -97,8 +100,9 @@ public class TripPassengersActivity extends MenuActivity {
                         progressPassengers.setVisibility(View.GONE);
                         return;
                     }
+                    tripEnded = trip.getDateTime() < System.currentTimeMillis();
                     updateTripSummary(trip);
-                    loadPassengerProfiles(trip.getPassengerIds());
+                    loadPassengerProfiles(trip);
                 });
     }
 
@@ -117,7 +121,8 @@ public class TripPassengersActivity extends MenuActivity {
         tvPassengerCount.setText(booked + " passenger" + (booked == 1 ? "" : "s") + " booked");
     }
 
-    private void loadPassengerProfiles(List<String> passengerIds) {
+    private void loadPassengerProfiles(Trip trip) {
+        List<String> passengerIds = trip.getPassengerIds();
         passengerList.clear();
 
         if (passengerIds == null || passengerIds.isEmpty()) {
@@ -133,12 +138,11 @@ public class TripPassengersActivity extends MenuActivity {
 
         int total = passengerIds.size();
         AtomicInteger remaining = new AtomicInteger(total);
-
         List<BookedPassenger> ordered = new ArrayList<>();
         for (int i = 0; i < total; i++) ordered.add(null);
 
         for (int i = 0; i < total; i++) {
-            final int index = i;
+            final int index  = i;
             final String uid = passengerIds.get(index);
 
             db.collection("users").document(uid).get()
@@ -148,11 +152,20 @@ public class TripPassengersActivity extends MenuActivity {
                             String name  = doc.getString("name");
                             String email = doc.getString("email");
                             String phone = doc.getString("phone");
-                            ordered.set(index, new BookedPassenger(
+                            Double avg   = doc.getDouble("averageRating");
+                            Long   count = doc.getLong("ratingCount");
+
+                            BookedPassenger bp = new BookedPassenger(
                                     uid,
                                     name  != null ? name  : "Unknown",
                                     email != null ? email : "",
-                                    phone != null ? phone : ""));
+                                    phone != null ? phone : "");
+
+                            if (avg != null && count != null && count > 0) {
+                                bp.setAverageRating(avg);
+                                bp.setRatingCount(count.intValue());
+                            }
+                            ordered.set(index, bp);
                         }
 
                         if (remaining.decrementAndGet() == 0) {
@@ -169,9 +182,37 @@ public class TripPassengersActivity extends MenuActivity {
                                 tvNoPassengers.setVisibility(View.GONE);
                             }
                             adapter.notifyDataSetChanged();
+
+                            if (!tripEnded) {
+                                scheduleAlarmsForAllPassengers(trip, passengerList);
+                            }
                         }
                     });
         }
+    }
+
+    private void scheduleAlarmsForAllPassengers(Trip trip, List<BookedPassenger> passengers) {
+        String driverId = mAuth.getCurrentUser() != null ? mAuth.getCurrentUser().getUid() : null;
+        if (driverId == null) return;
+
+        for (BookedPassenger p : passengers) {
+            RatingUtils.scheduleRatingNotification(
+                    this,
+                    trip.getTripId() + "_" + p.getUid(),
+                    p.getUid(),
+                    p.getName(),
+                    "driver",
+                    trip.getDateTime());
+        }
+    }
+
+    private void openRatePassenger(BookedPassenger passenger) {
+        Intent intent = new Intent(this, RatingActivity.class);
+        intent.putExtra(RatingActivity.EXTRA_TRIP_ID,         tripId);
+        intent.putExtra(RatingActivity.EXTRA_RATED_USER_ID,   passenger.getUid());
+        intent.putExtra(RatingActivity.EXTRA_RATED_USER_NAME, passenger.getName());
+        intent.putExtra(RatingActivity.EXTRA_RATER_TYPE,      "driver");
+        startActivity(intent);
     }
 
     @Override

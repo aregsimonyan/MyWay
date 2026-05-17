@@ -187,7 +187,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:layout_marginBottom="10dp">
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="6dp">
                             <TextView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
@@ -202,6 +203,29 @@
                                 android:textSize="13sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/colorPrimaryText"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="10dp">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Rating"
+                                android:textSize="13sp"
+                                android:textColor="@color/colorSecondaryText"/>
+                            <TextView
+                                android:id="@+id/tvDriverRating"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                android:textColor="#FFAA00"
+                                android:visibility="gone"/>
                         </LinearLayout>
 
                         <LinearLayout
@@ -348,6 +372,20 @@
                     android:backgroundTint="@color/colorMapButton"
                     android:textColor="#FFFFFF"
                     android:layout_marginBottom="12dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRateDriver"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:text="⭐  Rate Your Driver"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"
+                    app:cornerRadius="12dp"
+                    android:backgroundTint="#FFAA00"
+                    android:textColor="#111111"
+                    android:layout_marginBottom="12dp"
+                    android:visibility="gone"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnCancelBooking"

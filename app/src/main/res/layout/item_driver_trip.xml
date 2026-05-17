@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="6dp">
 
             <TextView
                 android:id="@+id/tvDriverTripRoute"
@@ -68,14 +68,30 @@
             android:gravity="center_vertical"
             android:layout_marginTop="6dp">
 
-            <TextView
-                android:id="@+id/tvDriverTripCar"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@color/colorSecondaryText"
-                android:textSize="12sp"
-                android:textStyle="italic"/>
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvDriverTripCar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorSecondaryText"
+                    android:textSize="12sp"
+                    android:textStyle="italic"/>
+
+                <TextView
+                    android:id="@+id/tvDriverOwnRating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#FFAA00"
+                    android:layout_marginTop="4dp"
+                    android:visibility="gone"/>
+
+            </LinearLayout>
 
             <Button
                 android:id="@+id/btnDeleteTrip"

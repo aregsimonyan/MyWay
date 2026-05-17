@@ -13,6 +13,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myway.R;
 import com.example.myway.TripPassengersActivity;
 import com.example.myway.models.Trip;
+import com.example.myway.utils.RatingUtils;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -56,6 +59,26 @@ public class DriverTripAdapter
 
         holder.tvCar.setText(trip.getCarCategory() + "  ·  " + trip.getLicensePlate());
 
+        holder.tvOwnRating.setVisibility(View.GONE);
+        String driverUid = FirebaseAuth.getInstance().getCurrentUser() != null
+                ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
+        if (driverUid != null) {
+            FirebaseFirestore.getInstance()
+                    .collection("users")
+                    .document(driverUid)
+                    .get()
+                    .addOnSuccessListener(doc -> {
+                        if (doc == null) return;
+                        Double avg   = doc.getDouble("averageRating");
+                        Long   count = doc.getLong("ratingCount");
+                        if (avg != null && count != null && count > 0) {
+                            holder.tvOwnRating.setText(
+                                    RatingUtils.buildStarsText(avg, count.intValue()));
+                            holder.tvOwnRating.setVisibility(View.VISIBLE);
+                        }
+                    });
+        }
+
         long now = System.currentTimeMillis();
         if (trip.getDateTime() < now) {
             holder.tvStatus.setText("PAST");
@@ -84,16 +107,18 @@ public class DriverTripAdapter
         TextView tvPrice;
         TextView tvCar;
         TextView tvStatus;
+        TextView tvOwnRating;
         Button   btnDelete;
 
         public DriverTripViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvRoute    = itemView.findViewById(R.id.tvDriverTripRoute);
-            tvDateTime = itemView.findViewById(R.id.tvDriverTripDateTime);
-            tvPrice    = itemView.findViewById(R.id.tvDriverTripPrice);
-            tvCar      = itemView.findViewById(R.id.tvDriverTripCar);
-            tvStatus   = itemView.findViewById(R.id.tvDriverTripStatus);
-            btnDelete  = itemView.findViewById(R.id.btnDeleteTrip);
+            tvRoute      = itemView.findViewById(R.id.tvDriverTripRoute);
+            tvDateTime   = itemView.findViewById(R.id.tvDriverTripDateTime);
+            tvPrice      = itemView.findViewById(R.id.tvDriverTripPrice);
+            tvCar        = itemView.findViewById(R.id.tvDriverTripCar);
+            tvStatus     = itemView.findViewById(R.id.tvDriverTripStatus);
+            tvOwnRating  = itemView.findViewById(R.id.tvDriverOwnRating);
+            btnDelete    = itemView.findViewById(R.id.btnDeleteTrip);
         }
     }
 }

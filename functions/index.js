@@ -1,9 +1,12 @@
 const { onDocumentUpdated } = require("firebase-functions/v2/firestore");
+const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { initializeApp }     = require("firebase-admin/app");
 const { getFirestore }      = require("firebase-admin/firestore");
 const { getMessaging }      = require("firebase-admin/messaging");
 
 initializeApp();
+
+// ─── Notify driver when a passenger books or cancels ─────────────────────────
 
 exports.notifyDriverOnBooking = onDocumentUpdated(
     "trips/{tripId}",
@@ -39,22 +42,14 @@ exports.notifyDriverOnBooking = onDocumentUpdated(
 
             await getMessaging().send({
                 token: fcmToken,
-                data: {
-                    tripId,
-                    passengerName,
-                    route,
-                    type: "booking",
-                },
+                data: { tripId, passengerName, route, type: "booking" },
                 notification: {
                     title: "New Booking!",
                     body:  `${passengerName} booked your trip: ${route}`,
                 },
                 android: {
                     priority: "high",
-                    notification: {
-                        channelId: "myway_bookings",
-                        sound:     "default",
-                    },
+                    notification: { channelId: "myway_bookings", sound: "default" },
                 },
             });
         }
@@ -65,26 +60,54 @@ exports.notifyDriverOnBooking = onDocumentUpdated(
 
             await getMessaging().send({
                 token: fcmToken,
-                data: {
-                    tripId,
-                    passengerName,
-                    route,
-                    type: "cancellation",
-                },
+                data: { tripId, passengerName, route, type: "cancellation" },
                 notification: {
                     title: "Booking Cancelled",
                     body:  `${passengerName} cancelled their booking: ${route}`,
                 },
                 android: {
                     priority: "high",
-                    notification: {
-                        channelId: "myway_bookings",
-                        sound:     "default",
-                    },
+                    notification: { channelId: "myway_bookings", sound: "default" },
                 },
             });
         }
 
+        return null;
+    }
+);
+
+
+exports.updateUserAverageRating = onDocumentCreated(
+    "ratings/{ratingId}",
+    async (event) => {
+        const rating = event.data.data();
+        if (!rating || !rating.ratedUserId) return null;
+
+        const db          = getFirestore();
+        const ratedUserId = rating.ratedUserId;
+
+        const snapshot = await db
+            .collection("ratings")
+            .where("ratedUserId", "==", ratedUserId)
+            .get();
+
+        if (snapshot.empty) return null;
+
+        let total = 0;
+        snapshot.forEach(doc => {
+            const stars = doc.data().stars;
+            if (typeof stars === "number") total += stars;
+        });
+
+        const count   = snapshot.size;
+        const average = Math.round((total / count) * 10) / 10;
+
+        await db.collection("users").doc(ratedUserId).update({
+            averageRating: average,
+            ratingCount:   count,
+        });
+
+        console.log(`Updated rating for user ${ratedUserId}: avg=${average}, count=${count}`);
         return null;
     }
 );

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myway.R;
 import com.example.myway.models.BookedPassenger;
+import com.example.myway.utils.RatingUtils;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
@@ -19,10 +20,24 @@ import java.util.List;
 public class PassengerAdapter
         extends RecyclerView.Adapter<PassengerAdapter.PassengerViewHolder> {
 
-    private final List<BookedPassenger> passengers;
+    public interface OnRateClickListener {
+        void onRateClick(BookedPassenger passenger);
+    }
 
-    public PassengerAdapter(List<BookedPassenger> passengers) {
-        this.passengers = passengers;
+    public interface TripEndedProvider {
+        boolean isTripEnded();
+    }
+
+    private final List<BookedPassenger> passengers;
+    private final OnRateClickListener   rateListener;
+    private final TripEndedProvider     tripEndedProvider;
+
+    public PassengerAdapter(List<BookedPassenger> passengers,
+                            OnRateClickListener rateListener,
+                            TripEndedProvider tripEndedProvider) {
+        this.passengers        = passengers;
+        this.rateListener      = rateListener;
+        this.tripEndedProvider = tripEndedProvider;
     }
 
     @NonNull
@@ -44,17 +59,33 @@ public class PassengerAdapter
         holder.tvPassengerEmail.setText(
                 p.getEmail() != null && !p.getEmail().isEmpty() ? p.getEmail() : "No email");
 
-        holder.btnCall.setOnClickListener(v -> {
-            String phone = p.getPhone();
-            if (phone == null || phone.isEmpty()) return;
-            Intent intent = new Intent(Intent.ACTION_DIAL);
-            intent.setData(Uri.parse("tel:" + phone));
-            v.getContext().startActivity(intent);
-        });
+        if (p.getRatingCount() > 0) {
+            holder.tvPassengerRating.setText(
+                    RatingUtils.buildStarsText(p.getAverageRating(), p.getRatingCount()));
+            holder.tvPassengerRating.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvPassengerRating.setVisibility(View.GONE);
+        }
 
-        holder.btnCall.setVisibility(
-                (p.getPhone() != null && !p.getPhone().isEmpty())
-                        ? View.VISIBLE : View.GONE);
+        boolean ended = tripEndedProvider.isTripEnded();
+
+        if (p.getPhone() != null && !p.getPhone().isEmpty()) {
+            holder.btnCall.setVisibility(View.VISIBLE);
+            holder.btnCall.setOnClickListener(v -> {
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                intent.setData(Uri.parse("tel:" + p.getPhone()));
+                v.getContext().startActivity(intent);
+            });
+        } else {
+            holder.btnCall.setVisibility(View.GONE);
+        }
+
+        if (ended) {
+            holder.btnRate.setVisibility(View.VISIBLE);
+            holder.btnRate.setOnClickListener(v -> rateListener.onRateClick(p));
+        } else {
+            holder.btnRate.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -65,15 +96,19 @@ public class PassengerAdapter
         TextView       tvPassengerName;
         TextView       tvPassengerPhone;
         TextView       tvPassengerEmail;
+        TextView       tvPassengerRating;
         MaterialButton btnCall;
+        MaterialButton btnRate;
 
         PassengerViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvPassengerNumber = itemView.findViewById(R.id.tvPassengerNumber);
-            tvPassengerName   = itemView.findViewById(R.id.tvPassengerName);
-            tvPassengerPhone  = itemView.findViewById(R.id.tvPassengerPhone);
-            tvPassengerEmail  = itemView.findViewById(R.id.tvPassengerEmail);
-            btnCall           = itemView.findViewById(R.id.btnCallPassenger);
+            tvPassengerNumber  = itemView.findViewById(R.id.tvPassengerNumber);
+            tvPassengerName    = itemView.findViewById(R.id.tvPassengerName);
+            tvPassengerPhone   = itemView.findViewById(R.id.tvPassengerPhone);
+            tvPassengerEmail   = itemView.findViewById(R.id.tvPassengerEmail);
+            tvPassengerRating  = itemView.findViewById(R.id.tvPassengerRating);
+            btnCall            = itemView.findViewById(R.id.btnCallPassenger);
+            btnRate            = itemView.findViewById(R.id.btnRatePassenger);
         }
     }
 }
