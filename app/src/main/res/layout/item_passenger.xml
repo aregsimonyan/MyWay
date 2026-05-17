@@ -35,14 +35,30 @@
                 android:background="@drawable/circle_green"
                 android:layout_marginEnd="12dp"/>
 
-            <TextView
-                android:id="@+id/tvPassengerName"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textSize="17sp"
-                android:textStyle="bold"
-                android:textColor="@color/colorPrimaryText"/>
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvPassengerName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorPrimaryText"/>
+
+                <TextView
+                    android:id="@+id/tvPassengerRating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#FFAA00"
+                    android:layout_marginTop="2dp"
+                    android:visibility="gone"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -108,7 +124,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
+            android:gravity="center_vertical">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCallPassenger"
@@ -128,38 +144,20 @@
                 app:iconTint="#FFFFFF"/>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnMessagePassenger"
+                android:id="@+id/btnRatePassenger"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:text="Message"
+                android:text="⭐ Rate"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#1565C0"
+                android:textColor="#111111"
+                android:backgroundTint="#FFAA00"
                 app:cornerRadius="10dp"
-                app:icon="@android:drawable/ic_menu_send"
-                app:iconGravity="textStart"
-                app:iconTint="#FFFFFF"/>
+                android:visibility="gone"/>
 
         </LinearLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnRatePassenger"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:text="Rate Passenger"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#F57C00"
-            android:visibility="gone"
-            app:cornerRadius="10dp"
-            app:icon="@android:drawable/btn_star_big_off"
-            app:iconGravity="textStart"
-            app:iconTint="#FFFFFF"/>
 
     </LinearLayout>
 

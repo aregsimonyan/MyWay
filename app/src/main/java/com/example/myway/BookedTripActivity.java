@@ -15,6 +15,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myway.models.Trip;
+import com.example.myway.utils.RatingUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
@@ -39,6 +40,7 @@ public class BookedTripActivity extends AppCompatActivity {
     private TextView tvBookedLicensePlate;
     private MaterialButton btnCallDriver;
     private MaterialButton btnMessageDriver;
+    private MaterialButton btnRateDriver;
     private TextView tvCountdown;
     private TextView tvCountdownLabel;
     private MaterialButton btnViewOnMap;
@@ -72,6 +74,7 @@ public class BookedTripActivity extends AppCompatActivity {
         tvBookedLicensePlate = findViewById(R.id.tvBookedLicensePlate);
         btnCallDriver        = findViewById(R.id.btnCallDriver);
         btnMessageDriver     = findViewById(R.id.btnMessageDriver);
+        btnRateDriver        = findViewById(R.id.btnRateDriver);
         tvCountdown          = findViewById(R.id.tvCountdown);
         tvCountdownLabel     = findViewById(R.id.tvCountdownLabel);
         btnViewOnMap         = findViewById(R.id.btnViewOnMap);
@@ -163,7 +166,8 @@ public class BookedTripActivity extends AppCompatActivity {
             });
         }
 
-        startCountdown(trip.getDateTime());
+        scheduleDriverRatingNotification(trip);
+        startCountdown(trip);
 
         btnViewOnMap.setOnClickListener(v -> {
             Intent intent = new Intent(this, MapActivity.class);
@@ -172,15 +176,42 @@ public class BookedTripActivity extends AppCompatActivity {
         });
 
         btnCancelBooking.setOnClickListener(v -> confirmCancel(trip));
+
+        btnRateDriver.setOnClickListener(v -> openRateDriver(trip));
     }
 
-    private void startCountdown(long tripTimeMillis) {
-        long remaining = tripTimeMillis - System.currentTimeMillis();
+    private void scheduleDriverRatingNotification(Trip trip) {
+        String passengerId = mAuth.getCurrentUser() != null
+                ? mAuth.getCurrentUser().getUid() : null;
+        if (passengerId == null) return;
+
+        RatingUtils.scheduleRatingNotification(
+                this,
+                trip.getTripId() + "_" + passengerId,
+                trip.getDriverId(),
+                trip.getDriverName(),
+                "passenger",
+                trip.getDateTime()
+        );
+    }
+
+    private void openRateDriver(Trip trip) {
+        Intent intent = new Intent(this, RatingActivity.class);
+        intent.putExtra(RatingActivity.EXTRA_TRIP_ID,         trip.getTripId());
+        intent.putExtra(RatingActivity.EXTRA_RATED_USER_ID,   trip.getDriverId());
+        intent.putExtra(RatingActivity.EXTRA_RATED_USER_NAME, trip.getDriverName());
+        intent.putExtra(RatingActivity.EXTRA_RATER_TYPE,      "passenger");
+        startActivity(intent);
+    }
+
+    private void startCountdown(Trip trip) {
+        long remaining = trip.getDateTime() - System.currentTimeMillis();
 
         if (remaining <= 0) {
             tvCountdown.setText("Trip has departed");
             tvCountdownLabel.setVisibility(View.GONE);
             btnCancelBooking.setVisibility(View.GONE);
+            btnRateDriver.setVisibility(View.VISIBLE);
             return;
         }
 
@@ -197,6 +228,7 @@ public class BookedTripActivity extends AppCompatActivity {
                 tvCountdown.setText("Trip has departed");
                 tvCountdownLabel.setVisibility(View.GONE);
                 btnCancelBooking.setVisibility(View.GONE);
+                btnRateDriver.setVisibility(View.VISIBLE);
             }
         }.start();
     }
