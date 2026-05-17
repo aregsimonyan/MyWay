@@ -187,8 +187,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginBottom="6dp">
+                            android:layout_marginBottom="10dp">
                             <TextView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
@@ -203,29 +202,6 @@
                                 android:textSize="13sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/colorPrimaryText"/>
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginBottom="10dp">
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Rating"
-                                android:textSize="13sp"
-                                android:textColor="@color/colorSecondaryText"/>
-                            <TextView
-                                android:id="@+id/tvDriverRating"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textSize="13sp"
-                                android:textStyle="bold"
-                                android:textColor="#FFAA00"
-                                android:visibility="gone"/>
                         </LinearLayout>
 
                         <LinearLayout
@@ -291,20 +267,47 @@
                                 android:textColor="@color/colorPrimaryText"/>
                         </LinearLayout>
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnCallDriver"
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="52dp"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:textAllCaps="false"
-                            android:textColor="#FFFFFF"
-                            android:backgroundTint="#2E7D32"
-                            app:cornerRadius="10dp"
-                            app:icon="@android:drawable/ic_menu_call"
-                            app:iconGravity="textStart"
-                            app:iconTint="#FFFFFF"
-                            android:visibility="gone"/>
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnCallDriver"
+                                android:layout_width="0dp"
+                                android:layout_height="52dp"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="8dp"
+                                android:text="Call Driver"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textAllCaps="false"
+                                android:textColor="#FFFFFF"
+                                android:backgroundTint="#2E7D32"
+                                app:cornerRadius="10dp"
+                                app:icon="@android:drawable/ic_menu_call"
+                                app:iconGravity="textStart"
+                                app:iconTint="#FFFFFF"
+                                android:visibility="gone"/>
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnMessageDriver"
+                                android:layout_width="0dp"
+                                android:layout_height="52dp"
+                                android:layout_weight="1"
+                                android:text="Message"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textAllCaps="false"
+                                android:textColor="#FFFFFF"
+                                android:backgroundTint="#1565C0"
+                                app:cornerRadius="10dp"
+                                app:icon="@android:drawable/ic_menu_send"
+                                app:iconGravity="textStart"
+                                app:iconTint="#FFFFFF"
+                                android:visibility="gone"/>
+
+                        </LinearLayout>
 
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
@@ -372,20 +375,6 @@
                     android:backgroundTint="@color/colorMapButton"
                     android:textColor="#FFFFFF"
                     android:layout_marginBottom="12dp"/>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnRateDriver"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:text="⭐  Rate Your Driver"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    android:textAllCaps="false"
-                    app:cornerRadius="12dp"
-                    android:backgroundTint="#FFAA00"
-                    android:textColor="#111111"
-                    android:layout_marginBottom="12dp"
-                    android:visibility="gone"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnCancelBooking"

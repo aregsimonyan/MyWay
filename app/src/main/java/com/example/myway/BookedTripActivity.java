@@ -15,7 +15,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myway.models.Trip;
-import com.example.myway.utils.RatingUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
@@ -29,30 +28,28 @@ import java.util.Locale;
 
 public class BookedTripActivity extends AppCompatActivity {
 
-    private ProgressBar    progressBooked;
-    private LinearLayout   layoutContent;
-    private TextView       tvBookedRoute;
-    private TextView       tvBookedDateTime;
-    private TextView       tvBookedPrice;
-    private TextView       tvBookedDriver;
-    private TextView       tvBookedCarModel;
-    private TextView       tvBookedCarCategory;
-    private TextView       tvBookedLicensePlate;
-    private TextView       tvDriverRating;
+    private ProgressBar progressBooked;
+    private LinearLayout layoutContent;
+    private TextView tvBookedRoute;
+    private TextView tvBookedDateTime;
+    private TextView tvBookedPrice;
+    private TextView tvBookedDriver;
+    private TextView tvBookedCarModel;
+    private TextView tvBookedCarCategory;
+    private TextView tvBookedLicensePlate;
     private MaterialButton btnCallDriver;
-    private TextView       tvCountdown;
-    private TextView       tvCountdownLabel;
+    private MaterialButton btnMessageDriver;
+    private TextView tvCountdown;
+    private TextView tvCountdownLabel;
     private MaterialButton btnViewOnMap;
     private MaterialButton btnCancelBooking;
-    private MaterialButton btnRateDriver;
 
     private FirebaseFirestore db;
-    private FirebaseAuth      mAuth;
-    private CountDownTimer    countDownTimer;
-    private Trip              currentTrip;
-    private String            tripId;
-    private String            driverPhone = "";
-    private String            driverName  = "";
+    private FirebaseAuth mAuth;
+    private CountDownTimer countDownTimer;
+    private Trip currentTrip;
+    private String tripId;
+    private String driverPhone = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,13 +70,12 @@ public class BookedTripActivity extends AppCompatActivity {
         tvBookedCarModel     = findViewById(R.id.tvBookedCarModel);
         tvBookedCarCategory  = findViewById(R.id.tvBookedCarCategory);
         tvBookedLicensePlate = findViewById(R.id.tvBookedLicensePlate);
-        tvDriverRating       = findViewById(R.id.tvDriverRating);
         btnCallDriver        = findViewById(R.id.btnCallDriver);
+        btnMessageDriver     = findViewById(R.id.btnMessageDriver);
         tvCountdown          = findViewById(R.id.tvCountdown);
         tvCountdownLabel     = findViewById(R.id.tvCountdownLabel);
         btnViewOnMap         = findViewById(R.id.btnViewOnMap);
         btnCancelBooking     = findViewById(R.id.btnCancelBooking);
-        btnRateDriver        = findViewById(R.id.btnRateDriver);
 
         if (tripId == null) {
             Toast.makeText(this, "Trip not found.", Toast.LENGTH_SHORT).show();
@@ -95,45 +91,43 @@ public class BookedTripActivity extends AppCompatActivity {
         layoutContent.setVisibility(View.GONE);
 
         db.collection("trips").document(tripId).get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null
-                            && task.getResult().exists()) {
-                        currentTrip = task.getResult().toObject(Trip.class);
-                        if (currentTrip != null) {
-                            loadDriverDetails(currentTrip);
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful() && task.getResult() != null
+                                && task.getResult().exists()) {
+                            currentTrip = task.getResult().toObject(Trip.class);
+                            if (currentTrip != null) {
+                                loadDriverPhone(currentTrip);
+                            } else {
+                                progressBooked.setVisibility(View.GONE);
+                                Toast.makeText(BookedTripActivity.this,
+                                        "Trip data is empty.", Toast.LENGTH_SHORT).show();
+                            }
                         } else {
                             progressBooked.setVisibility(View.GONE);
+                            Toast.makeText(BookedTripActivity.this,
+                                    "Could not load trip details.", Toast.LENGTH_SHORT).show();
                         }
-                    } else {
-                        progressBooked.setVisibility(View.GONE);
-                        Toast.makeText(this, "Could not load trip details.", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
-    private void loadDriverDetails(Trip trip) {
+    private void loadDriverPhone(Trip trip) {
         db.collection("users").document(trip.getDriverId()).get()
-                .addOnCompleteListener(task -> {
-                    progressBooked.setVisibility(View.GONE);
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        DocumentSnapshot doc = task.getResult();
-                        String phone = doc.getString("phone");
-                        if (phone != null && !phone.isEmpty()) driverPhone = phone;
-
-                        String fetchedName = doc.getString("name");
-                        if (fetchedName != null && !fetchedName.isEmpty()) driverName = fetchedName;
-
-                        Double avg   = doc.getDouble("averageRating");
-                        Long   count = doc.getLong("ratingCount");
-                        if (avg != null && count != null && count > 0) {
-                            tvDriverRating.setText(RatingUtils.buildStarsText(avg, count.intValue()));
-                            tvDriverRating.setVisibility(View.VISIBLE);
-                        } else {
-                            tvDriverRating.setVisibility(View.GONE);
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        progressBooked.setVisibility(View.GONE);
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            String phone = task.getResult().getString("phone");
+                            if (phone != null && !phone.isEmpty()) {
+                                driverPhone = phone;
+                            }
                         }
+                        displayTripInfo(trip);
+                        layoutContent.setVisibility(View.VISIBLE);
                     }
-                    displayTripInfo(trip);
-                    layoutContent.setVisibility(View.VISIBLE);
                 });
     }
 
@@ -148,21 +142,26 @@ public class BookedTripActivity extends AppCompatActivity {
         tvBookedCarModel.setText(
                 trip.getCarModel() != null && !trip.getCarModel().isEmpty()
                         ? trip.getCarModel() : "—");
-        tvBookedCarCategory.setText(trip.getCarCategory() != null ? trip.getCarCategory() : "—");
-        tvBookedLicensePlate.setText(trip.getLicensePlate() != null ? trip.getLicensePlate() : "—");
+        tvBookedCarCategory.setText(
+                trip.getCarCategory() != null ? trip.getCarCategory() : "—");
+        tvBookedLicensePlate.setText(
+                trip.getLicensePlate() != null ? trip.getLicensePlate() : "—");
 
         if (!driverPhone.isEmpty()) {
             btnCallDriver.setVisibility(View.VISIBLE);
-            btnCallDriver.setText("Call Driver  " + driverPhone);
             btnCallDriver.setOnClickListener(v -> {
                 Intent intent = new Intent(Intent.ACTION_DIAL);
                 intent.setData(Uri.parse("tel:" + driverPhone));
                 startActivity(intent);
             });
-        }
 
-        long now      = System.currentTimeMillis();
-        boolean ended = trip.getDateTime() < now;
+            btnMessageDriver.setVisibility(View.VISIBLE);
+            btnMessageDriver.setOnClickListener(v -> {
+                Intent intent = new Intent(Intent.ACTION_SENDTO);
+                intent.setData(Uri.parse("sms:" + driverPhone));
+                startActivity(intent);
+            });
+        }
 
         startCountdown(trip.getDateTime());
 
@@ -172,38 +171,7 @@ public class BookedTripActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        if (ended) {
-            btnCancelBooking.setVisibility(View.GONE);
-            btnRateDriver.setVisibility(View.VISIBLE);
-            btnRateDriver.setOnClickListener(v -> openRatingScreen(trip));
-        } else {
-            btnCancelBooking.setVisibility(View.VISIBLE);
-            btnRateDriver.setVisibility(View.GONE);
-            btnCancelBooking.setOnClickListener(v -> confirmCancel(trip));
-
-            String nameToUse = !driverName.isEmpty() ? driverName : trip.getDriverName();
-            if (nameToUse == null) nameToUse = "Driver";
-
-            RatingUtils.scheduleRatingNotification(
-                    this,
-                    trip.getTripId(),
-                    trip.getDriverId(),
-                    nameToUse,
-                    "passenger",
-                    trip.getDateTime());
-        }
-    }
-
-    private void openRatingScreen(Trip trip) {
-        String nameToUse = !driverName.isEmpty() ? driverName : trip.getDriverName();
-        if (nameToUse == null) nameToUse = "Driver";
-
-        Intent intent = new Intent(this, RatingActivity.class);
-        intent.putExtra(RatingActivity.EXTRA_TRIP_ID,         trip.getTripId());
-        intent.putExtra(RatingActivity.EXTRA_RATED_USER_ID,   trip.getDriverId());
-        intent.putExtra(RatingActivity.EXTRA_RATED_USER_NAME, nameToUse);
-        intent.putExtra(RatingActivity.EXTRA_RATER_TYPE,      "passenger");
-        startActivity(intent);
+        btnCancelBooking.setOnClickListener(v -> confirmCancel(trip));
     }
 
     private void startCountdown(long tripTimeMillis) {
@@ -212,6 +180,7 @@ public class BookedTripActivity extends AppCompatActivity {
         if (remaining <= 0) {
             tvCountdown.setText("Trip has departed");
             tvCountdownLabel.setVisibility(View.GONE);
+            btnCancelBooking.setVisibility(View.GONE);
             return;
         }
 
@@ -228,10 +197,6 @@ public class BookedTripActivity extends AppCompatActivity {
                 tvCountdown.setText("Trip has departed");
                 tvCountdownLabel.setVisibility(View.GONE);
                 btnCancelBooking.setVisibility(View.GONE);
-                btnRateDriver.setVisibility(View.VISIBLE);
-                if (currentTrip != null) {
-                    btnRateDriver.setOnClickListener(v -> openRatingScreen(currentTrip));
-                }
             }
         }.start();
     }
@@ -258,17 +223,21 @@ public class BookedTripActivity extends AppCompatActivity {
         String uid = mAuth.getCurrentUser().getUid();
         db.collection("trips").document(trip.getTripId())
                 .update(
-                        "passengerIds",    FieldValue.arrayRemove(uid),
-                        "seatsAvailable",  trip.getSeatsAvailable() + 1
+                        "passengerIds", FieldValue.arrayRemove(uid),
+                        "seatsAvailable", trip.getSeatsAvailable() + 1
                 )
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(this, "Booking cancelled.", Toast.LENGTH_SHORT).show();
-                        finish();
-                    } else {
-                        Toast.makeText(this,
-                                "Could not cancel: " + task.getException().getMessage(),
-                                Toast.LENGTH_SHORT).show();
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(BookedTripActivity.this,
+                                    "Booking cancelled.", Toast.LENGTH_SHORT).show();
+                            finish();
+                        } else {
+                            Toast.makeText(BookedTripActivity.this,
+                                    "Could not cancel: " + task.getException().getMessage(),
+                                    Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
     }
@@ -276,6 +245,8 @@ public class BookedTripActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (countDownTimer != null) countDownTimer.cancel();
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
     }
 }

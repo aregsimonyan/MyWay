@@ -12,10 +12,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myway.R;
 import com.example.myway.models.BookedPassenger;
-import com.example.myway.utils.RatingUtils;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 public class PassengerAdapter
         extends RecyclerView.Adapter<PassengerAdapter.PassengerViewHolder> {
@@ -24,20 +24,16 @@ public class PassengerAdapter
         void onRateClick(BookedPassenger passenger);
     }
 
-    public interface TripEndedProvider {
-        boolean isTripEnded();
-    }
-
     private final List<BookedPassenger> passengers;
     private final OnRateClickListener   rateListener;
-    private final TripEndedProvider     tripEndedProvider;
+    private final Supplier<Boolean>     tripEndedSupplier;
 
     public PassengerAdapter(List<BookedPassenger> passengers,
                             OnRateClickListener rateListener,
-                            TripEndedProvider tripEndedProvider) {
+                            Supplier<Boolean> tripEndedSupplier) {
         this.passengers        = passengers;
         this.rateListener      = rateListener;
-        this.tripEndedProvider = tripEndedProvider;
+        this.tripEndedSupplier = tripEndedSupplier;
     }
 
     @NonNull
@@ -59,32 +55,31 @@ public class PassengerAdapter
         holder.tvPassengerEmail.setText(
                 p.getEmail() != null && !p.getEmail().isEmpty() ? p.getEmail() : "No email");
 
-        if (p.getRatingCount() > 0) {
-            holder.tvPassengerRating.setText(
-                    RatingUtils.buildStarsText(p.getAverageRating(), p.getRatingCount()));
-            holder.tvPassengerRating.setVisibility(View.VISIBLE);
-        } else {
-            holder.tvPassengerRating.setVisibility(View.GONE);
-        }
+        boolean hasPhone  = p.getPhone() != null && !p.getPhone().isEmpty();
+        boolean tripEnded = tripEndedSupplier != null && Boolean.TRUE.equals(tripEndedSupplier.get());
 
-        boolean ended = tripEndedProvider.isTripEnded();
+        holder.btnCall.setVisibility(hasPhone ? View.VISIBLE : View.GONE);
+        holder.btnMessage.setVisibility(hasPhone ? View.VISIBLE : View.GONE);
 
-        if (p.getPhone() != null && !p.getPhone().isEmpty()) {
-            holder.btnCall.setVisibility(View.VISIBLE);
-            holder.btnCall.setOnClickListener(v -> {
-                Intent intent = new Intent(Intent.ACTION_DIAL);
-                intent.setData(Uri.parse("tel:" + p.getPhone()));
-                v.getContext().startActivity(intent);
-            });
-        } else {
-            holder.btnCall.setVisibility(View.GONE);
-        }
+        holder.btnCall.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_DIAL);
+            intent.setData(Uri.parse("tel:" + p.getPhone()));
+            v.getContext().startActivity(intent);
+        });
 
-        if (ended) {
-            holder.btnRate.setVisibility(View.VISIBLE);
-            holder.btnRate.setOnClickListener(v -> rateListener.onRateClick(p));
-        } else {
-            holder.btnRate.setVisibility(View.GONE);
+        holder.btnMessage.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_SENDTO);
+            intent.setData(Uri.parse("sms:" + p.getPhone()));
+            v.getContext().startActivity(intent);
+        });
+
+        if (holder.btnRate != null) {
+            if (tripEnded && rateListener != null) {
+                holder.btnRate.setVisibility(View.VISIBLE);
+                holder.btnRate.setOnClickListener(v -> rateListener.onRateClick(p));
+            } else {
+                holder.btnRate.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -96,19 +91,19 @@ public class PassengerAdapter
         TextView       tvPassengerName;
         TextView       tvPassengerPhone;
         TextView       tvPassengerEmail;
-        TextView       tvPassengerRating;
         MaterialButton btnCall;
+        MaterialButton btnMessage;
         MaterialButton btnRate;
 
         PassengerViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvPassengerNumber  = itemView.findViewById(R.id.tvPassengerNumber);
-            tvPassengerName    = itemView.findViewById(R.id.tvPassengerName);
-            tvPassengerPhone   = itemView.findViewById(R.id.tvPassengerPhone);
-            tvPassengerEmail   = itemView.findViewById(R.id.tvPassengerEmail);
-            tvPassengerRating  = itemView.findViewById(R.id.tvPassengerRating);
-            btnCall            = itemView.findViewById(R.id.btnCallPassenger);
-            btnRate            = itemView.findViewById(R.id.btnRatePassenger);
+            tvPassengerNumber = itemView.findViewById(R.id.tvPassengerNumber);
+            tvPassengerName   = itemView.findViewById(R.id.tvPassengerName);
+            tvPassengerPhone  = itemView.findViewById(R.id.tvPassengerPhone);
+            tvPassengerEmail  = itemView.findViewById(R.id.tvPassengerEmail);
+            btnCall           = itemView.findViewById(R.id.btnCallPassenger);
+            btnMessage        = itemView.findViewById(R.id.btnMessagePassenger);
+            btnRate           = itemView.findViewById(R.id.btnRatePassenger);
         }
     }
 }

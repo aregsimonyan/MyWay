@@ -104,6 +104,7 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
     private MaterialButton btnShowAllRoutes;
     private MaterialButton btnShowAllRequestRoutes;
     private MaterialButton btnCallPassenger;
+    private MaterialButton btnMessagePassenger;
 
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
@@ -159,6 +160,7 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
         btnShowAllRoutes       = findViewById(R.id.btnShowAllRoutes);
         btnShowAllRequestRoutes = findViewById(R.id.btnShowAllRequestRoutes);
         btnCallPassenger       = findViewById(R.id.btnCallPassenger);
+        btnMessagePassenger    = findViewById(R.id.btnMessagePassenger);
 
         btnCloseInfo.setOnClickListener(v -> {
             if (isolatedTripId != null || isolatedRequestId != null) {
@@ -196,6 +198,7 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
         btnShowAllRequestRoutes.setVisibility(View.GONE);
         btnBookFromMap.setVisibility(View.GONE);
         btnCallPassenger.setVisibility(View.GONE);
+        btnMessagePassenger.setVisibility(View.GONE);
         cardRouteInfo.setVisibility(View.GONE);
         redrawRoutes();
     }
@@ -326,7 +329,6 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
         }
     }
 
-    // Zooms into a single trip route and shows its details with booking actions
     private void isolateTripOnMap(Trip trip) {
         isolatedTripId = trip.getTripId();
 
@@ -342,7 +344,6 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
         showDriverRouteInfo(trip, true);
     }
 
-    // Zooms into a single passenger request route and shows full passenger details
     private void isolateRequestOnMap(PassengerRequest req) {
         isolatedRequestId = req.getRequestId();
 
@@ -518,7 +519,6 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
         return list;
     }
 
-    // Shows the driver route info card with optional booking/back buttons
     private void showDriverRouteInfo(Trip trip, boolean showActions) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy  HH:mm", Locale.US);
 
@@ -571,6 +571,7 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
 
         btnShowAllRequestRoutes.setVisibility(View.GONE);
         btnCallPassenger.setVisibility(View.GONE);
+        btnMessagePassenger.setVisibility(View.GONE);
 
         layoutDriverInfo.setVisibility(View.VISIBLE);
         layoutPassengerInfo.setVisibility(View.GONE);
@@ -588,11 +589,7 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
         tvInfoPassenger.setText(req.getPassengerName());
 
         String phone = req.getPassengerPhone();
-        if (phone != null && !phone.isEmpty()) {
-            tvInfoPassengerPhone.setText(phone);
-        } else {
-            tvInfoPassengerPhone.setText("—");
-        }
+        tvInfoPassengerPhone.setText(phone != null && !phone.isEmpty() ? phone : "—");
 
         if (showActions) {
             btnShowAllRequestRoutes.setVisibility(View.VISIBLE);
@@ -604,12 +601,21 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
                     callIntent.setData(Uri.parse("tel:" + phone));
                     startActivity(callIntent);
                 });
+
+                btnMessagePassenger.setVisibility(View.VISIBLE);
+                btnMessagePassenger.setOnClickListener(v -> {
+                    Intent smsIntent = new Intent(Intent.ACTION_SENDTO);
+                    smsIntent.setData(Uri.parse("sms:" + phone));
+                    startActivity(smsIntent);
+                });
             } else {
                 btnCallPassenger.setVisibility(View.GONE);
+                btnMessagePassenger.setVisibility(View.GONE);
             }
         } else {
             btnShowAllRequestRoutes.setVisibility(View.GONE);
             btnCallPassenger.setVisibility(View.GONE);
+            btnMessagePassenger.setVisibility(View.GONE);
         }
 
         btnShowAllRoutes.setVisibility(View.GONE);
@@ -750,7 +756,7 @@ public class MapActivity extends MenuActivity implements OnMapReadyCallback {
                 myMap.getUiSettings().setMyLocationButtonEnabled(false);
             }
             getLastLocation();
-        } else {    
+        } else {
             Toast.makeText(this, "Location permission denied.", Toast.LENGTH_SHORT).show();
         }
     }
