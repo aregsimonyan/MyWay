@@ -90,9 +90,6 @@ public abstract class MenuActivity extends AppCompatActivity {
             } else if (id == R.id.action_account) {
                 startActivity(new Intent(MenuActivity.this, ProfileActivity.class));
                 return true;
-            } else if (id == R.id.action_language) {
-                showLanguageDialog();
-                return true;
             } else if (id == R.id.action_logout) {
                 showLogoutConfirmation();
                 return true;
@@ -159,50 +156,5 @@ public abstract class MenuActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
-    }
-
-    protected void showLanguageDialog() {
-        final String[] languages     = {"English", "Русский", "Հայերեն"};
-        final String[] languageCodes = {"en", "ru", "hy"};
-
-        int currentSelection = getCurrentLanguageIndex(languageCodes);
-
-        new AlertDialog.Builder(this)
-                .setTitle("Select Language")
-                .setSingleChoiceItems(languages, currentSelection, (dialog, which) -> {
-                    applyLocale(languageCodes[which]);
-                    dialog.dismiss();
-                    recreate();
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
-    }
-
-    private int getCurrentLanguageIndex(String[] codes) {
-        SharedPreferences prefs = getSharedPreferences("LanguagePrefs", MODE_PRIVATE);
-        String currentLang = prefs.getString("language", "en");
-        for (int i = 0; i < codes.length; i++) {
-            if (codes[i].equals(currentLang)) return i;
-        }
-        return 0;
-    }
-
-    protected void loadLocale() {
-        SharedPreferences prefs = getSharedPreferences("LanguagePrefs", MODE_PRIVATE);
-        String languageCode = prefs.getString("language", "en");
-        applyLocale(languageCode);
-    }
-
-    private void applyLocale(String languageCode) {
-        SharedPreferences prefs = getSharedPreferences("LanguagePrefs", MODE_PRIVATE);
-        prefs.edit().putString("language", languageCode).apply();
-
-        Locale locale = new Locale(languageCode);
-        Locale.setDefault(locale);
-
-        Resources resources = getResources();
-        Configuration configuration = resources.getConfiguration();
-        configuration.setLocale(locale);
-        resources.updateConfiguration(configuration, resources.getDisplayMetrics());
     }
 }

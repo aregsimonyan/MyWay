@@ -41,7 +41,6 @@ public class EditProfileActivity extends MenuActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        loadLocale();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
 
