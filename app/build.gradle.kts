@@ -12,7 +12,7 @@ if (localPropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.example.myway"
+    namespace = "com.myway.myway"
     compileSdk = 36
 
     buildFeatures {
@@ -20,7 +20,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.myway"
+        applicationId = "com.myway.myway"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
